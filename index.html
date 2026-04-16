@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Swati Tutorials</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Poppins:wght@500;600;700;800&display=swap');
+:root{
+  --p:#7C3AED;--p2:#6D28D9;--p3:#5B21B6;--pl:#EDE9FE;--pl2:#DDD6FE;
+  --g:#059669;--gl:#D1FAE5;--gc:#10B981;
+  --r:#DC2626;--rl:#FEE2E2;
+  --o:#D97706;--ol:#FEF3C7;
+  --b:#2563EB;--bl:#DBEAFE;
+  --t1:#1E1B4B;--t2:#4B5563;--t3:#9CA3AF;
+  --bg:#F5F3FF;--card:#FFFFFF;
+  --border:#E5E7EB;--border2:#EDE9FE;
+  --sh:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(124,58,237,0.08);
+  --sh2:0 2px 8px rgba(124,58,237,0.15);
+  --rad:16px;--rad2:12px;--rad3:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Nunito',sans-serif;background:#C4B5FD;display:flex;justify-content:center;align-items:center}
+
+/* ── App Shell ── */
+#app{width:100%;max-width:430px;height:100vh;max-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(109,40,217,0.4)}
+
+/* ── Status Bar ── */
+#statusBar{background:var(--p);padding:5px 16px;display:flex;justify-content:space-between;flex-shrink:0}
+#statusBar span{color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;letter-spacing:0.3px}
+
+/* ── Views ── */
+.view{display:none;flex-direction:column;height:calc(100vh - 28px);overflow:hidden}
+.view.active{display:flex}
+
+/* ── Login ── */
+#loginView{background:linear-gradient(160deg,var(--p3) 0%,var(--p) 50%,#8B5CF6 100%);justify-content:center;align-items:center;padding:32px 24px;height:100vh}
+.login-logo{text-align:center;margin-bottom:40px}
+.login-logo .icon{font-size:56px;display:block;margin-bottom:12px}
+.login-logo h1{color:#fff;font-size:26px;font-weight:900;font-family:'Poppins',sans-serif}
+.login-logo p{color:rgba(255,255,255,0.7);font-size:13px;margin-top:4px}
+.login-box{background:#fff;border-radius:24px;padding:24px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.login-box h2{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:4px}
+.login-box p{font-size:12px;color:var(--t3);margin-bottom:20px}
+.role-select{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.role-opt{border:2px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fff}
+.role-opt.selected{border-color:var(--p);background:var(--pl)}
+.role-opt .ri{font-size:22px;display:block;margin-bottom:4px}
+.role-opt .rl{font-size:11px;font-weight:800;color:var(--t2)}
+.role-opt.selected .rl{color:var(--p)}
+.otp-box{display:none}
+.otp-digits{display:flex;gap:8px;justify-content:center;margin:12px 0}
+.otp-digit{width:48px;height:52px;border:2px solid var(--border);border-radius:12px;text-align:center;font-size:20px;font-weight:800;color:var(--t1);font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s}
+.otp-digit:focus{border-color:var(--p)}
+.demo-hint{background:var(--pl);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--p3);font-weight:700;text-align:center;margin-bottom:12px}
+
+/* ── Top Bar ── */
+.topbar{background:linear-gradient(135deg,var(--p),var(--p2));padding:12px 16px 14px;flex-shrink:0;position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:rgba(255,255,255,0.05);border-radius:50%}
+.tb-row{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.tb-left .brand{font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:1.5px;text-transform:uppercase;font-weight:800}
+.tb-left .pg-title{font-size:17px;font-weight:800;color:#fff;font-family:'Poppins',sans-serif;margin-top:2px;line-height:1.2}
+.tb-left .pg-sub{font-size:11px;color:rgba(255,255,255,0.7);margin-top:3px}
+.tb-right{display:flex;gap:8px;align-items:flex-start;margin-top:2px}
+.icon-btn{width:34px;height:34px;background:rgba(255,255,255,0.15);border:none;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;position:relative;flex-shrink:0}
+.icon-btn .badge{width:8px;height:8px;background:#FF6B6B;border-radius:50%;position:absolute;top:5px;right:5px;border:1.5px solid var(--p)}
+
+/* ── Role Tabs ── */
+.role-bar{background:var(--p2);display:flex;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.role-bar::-webkit-scrollbar{display:none}
+.rtab{padding:9px 16px;font-size:12px;color:rgba(255,255,255,0.55);border:none;background:transparent;cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;font-weight:800;font-family:'Nunito',sans-serif;transition:all 0.2s}
+.rtab.active{color:#fff;border-bottom-color:#fff}
+
+/* ── Content Area ── */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.page{display:none;padding:14px;animation:fadeIn 0.2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Bottom Nav ── */
+.bnav{background:#fff;border-top:1.5px solid var(--border2);display:flex;padding:5px 0 max(10px, env(safe-area-inset-bottom));flex-shrink:0}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;cursor:pointer;padding:5px;transition:all 0.15s}
+.nb span{font-size:9px;color:var(--t3);font-weight:700;font-family:'Nunito',sans-serif;transition:color 0.15s}
+.nb.active span{color:var(--p)}
+.ni{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all 0.15s}
+.nb.active .ni{background:var(--pl)}
+
+/* ── Stats Grid ── */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sc{background:var(--card);border-radius:var(--rad2);padding:14px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.sc::after{content:attr(data-icon);position:absolute;right:8px;top:8px;font-size:24px;opacity:0.15}
+.sc .sl{font-size:9px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px}
+.sc .sv{font-size:26px;font-weight:900;color:var(--t1);font-family:'Poppins',sans-serif;line-height:1}
+.sc .ss{font-size:11px;color:var(--t3);margin-top:4px;font-weight:600}
+.sc .st{font-size:11px;font-weight:700;margin-top:4px}
+.sc .st.up{color:var(--gc)}
+.sc .st.dn{color:var(--r)}
+
+/* ── Section Labels ── */
+.sec-label{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 8px;display:flex;justify-content:space-between;align-items:center}
+.sec-label .sa{font-size:11px;color:var(--p);font-weight:700;cursor:pointer;text-transform:none;letter-spacing:0}
+
+/* ── Cards ── */
+.card{background:var(--card);border-radius:var(--rad2);padding:13px;margin-bottom:9px;box-shadow:var(--sh)}
+.card-head{display:flex;align-items:center;gap:10px}
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;letter-spacing:0.5px}
+.av-sm{width:32px;height:32px;font-size:10px}
+.nm{font-size:13px;font-weight:800;color:var(--t1)}
+.nm-sm{font-size:12px}
+.sub{font-size:11px;color:var(--t3);margin-top:2px;font-weight:600}
+.mla{margin-left:auto}
+
+/* ── Badges ── */
+.bdg{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:800;display:inline-block;white-space:nowrap}
+.bdg-g{background:var(--gl);color:#065F46}
+.bdg-r{background:var(--rl);color:#991B1B}
+.bdg-p{background:var(--pl);color:var(--p3)}
+.bdg-b{background:var(--bl);color:#1E40AF}
+.bdg-o{background:var(--ol);color:#92400E}
+
+/* ── Dividers & Rows ── */
+.divider{height:1px;background:var(--border2);margin:10px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.row.b{border-bottom:1px solid var(--border2)}
+.row.b:last-child{border-bottom:none}
+.rk{font-size:12px;color:var(--t2);font-weight:600}
+.rv{font-size:12px;font-weight:800;color:var(--t1)}
+
+/* ── Buttons ── */
+.btn{width:100%;padding:13px;background:var(--p);color:#fff;border:none;border-radius:var(--rad2);font-size:14px;font-weight:800;cursor:pointer;margin-top:10px;font-family:'Nunito',sans-serif;letter-spacing:0.2px;transition:all 0.15s;position:relative;overflow:hidden}
+.btn:active{transform:scale(0.97);opacity:0.9}
+.btn.btn-g{background:var(--gc)}
+.btn.btn-r{background:var(--r)}
+.btn-out{width:100%;padding:11px;background:transparent;color:var(--p);border:2px solid var(--p);border-radius:var(--rad2);font-size:13px;font-weight:800;cursor:pointer;margin-top:8px;font-family:'Nunito',sans-serif;transition:all 0.15s}
+.btn-sm{padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:var(--rad3);font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s}
+.btn-sm:active{transform:scale(0.95)}
+.btn-sm.g{background:var(--gc)}
+.btn-sm.r{background:var(--rl);color:var(--r)}
+.btn-sm.o{background:var(--ol);color:var(--o)}
+.btn-sm.s{background:var(--pl);color:var(--p)}
+.btn-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+/* ── Forms ── */
+.fgroup{margin-bottom:12px}
+.flabel{font-size:11px;font-weight:800;color:var(--t2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.3px}
+.finp{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--rad3);font-size:13px;color:var(--t1);background:#FAFAFA;font-family:'Nunito',sans-serif;font-weight:600;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.finp:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(124,58,237,0.1)}
+select.finp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px}
+textarea.finp{resize:none;min-height:80px}
+.finp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap .si{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.search-wrap .finp{padding-left:38px;margin-bottom:0}
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
+.chk-item{display:flex;align-items:center;gap:5px;cursor:pointer}
+.chk-item input{width:15px;height:15px;accent-color:var(--p);cursor:pointer}
+.chk-item span{font-size:12px;font-weight:700;color:var(--t2)}
+.upload-area{border:2px dashed var(--border2);border-radius:var(--rad2);padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--pl)}
+.upload-area:hover{border-color:var(--p)}
+.upload-area .ua-icon{font-size:28px;margin-bottom:6px}
+.upload-area .ua-text{font-size:12px;color:var(--t3);font-weight:700}
+
+/* ── Tab Pills ── */
+.tab-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px}
+.tab-pills::-webkit-scrollbar{display:none}
+.pill{font-size:11px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--t3);cursor:pointer;white-space:nowrap;font-weight:800;font-family:'Nunito',sans-serif;transition:all 0.2s;flex-shrink:0}
+.pill.active{background:var(--p);color:#fff;border-color:var(--p)}
+
+/* ── Attendance ── */
+.att-row{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border2)}
+.att-row:last-child{border-bottom:none}
+.att-btns{display:flex;gap:4px;margin-left:auto}
+.att-btn{width:30px;height:28px;border-radius:6px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:11px;font-weight:800;color:var(--t3);transition:all 0.15s;font-family:'Nunito',sans-serif}
+.att-btn.ap{background:var(--gl);color:#065F46;border-color:#6EE7B7}
+.att-btn.aa{background:var(--rl);color:#991B1B;border-color:#FCA5A5}
+.att-btn.al{background:var(--ol);color:#92400E;border-color:#FCD34D}
+
+/* ── Progress Bars ── */
+.prog-wrap{margin-bottom:12px}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;font-weight:700}
+.prog-bar{height:8px;background:var(--pl2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:var(--p);transition:width 0.6s ease}
+.prog-fill.g{background:var(--gc)}
+.prog-fill.o{background:var(--o)}
+.prog-fill.r{background:var(--r)}
+
+/* ── Timeline ── */
+.tl{padding:0}
+.tl-item{display:flex;gap:12px;padding-bottom:14px;position:relative}
+.tl-item::before{content:'';position:absolute;left:5px;top:14px;bottom:0;width:2px;background:var(--border2)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--p);flex-shrink:0;margin-top:2px;z-index:1;border:2px solid var(--pl)}
+.tl-dot.g{background:var(--gc)}
+.tl-dot.o{background:var(--o)}
+.tl-body{flex:1}
+.tl-title{font-size:12px;font-weight:800;color:var(--t1)}
+.tl-sub{font-size:11px;color:var(--t3);margin-top:2px;font-weight:600}
+
+/* ── Notice Cards ── */
+.notice-card{border-left:3px solid var(--p);padding:10px 12px;background:var(--card);border-radius:0 var(--rad2) var(--rad2) 0;margin-bottom:8px;box-shadow:var(--sh)}
+.notice-card .nt{font-size:13px;font-weight:800;color:var(--t1)}
+.notice-card .nb{font-size:12px;color:var(--t2);margin-top:3px;font-weight:600;line-height:1.4}
+.notice-card .nm{font-size:11px;color:var(--t3);margin-top:5px;font-weight:700}
+
+/* ── Homework Cards ── */
+.hw-card{background:var(--card);border-radius:var(--rad2);padding:12px 13px;margin-bottom:8px;border-left:3px solid var(--p);box-shadow:var(--sh);display:flex;align-items:flex-start;gap:10px}
+.hw-card .hw-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.hw-card .hs{font-size:13px;font-weight:800;color:var(--t1)}
+.hw-card .hd{font-size:11px;color:var(--t3);margin-top:3px;font-weight:600}
+
+/* ── Timetable ── */
+.tt-row{display:flex;gap:8px;margin-bottom:8px;align-items:stretch}
+.tt-time{width:58px;font-size:10px;color:var(--t3);padding-top:9px;flex-shrink:0;font-weight:800;text-align:right}
+.tt-block{flex:1;border-radius:var(--rad2);padding:9px 11px;min-height:44px}
+.tt-block .tt-sub{font-size:12px;font-weight:900;line-height:1.2}
+.tt-block .tt-info{font-size:10px;margin-top:3px;opacity:0.8;font-weight:700}
+
+/* ── Stars ── */
+.stars-row{display:flex;gap:6px;margin:6px 0}
+.star{font-size:26px;cursor:pointer;transition:transform 0.1s;user-select:none}
+.star:active{transform:scale(1.3)}
+.star.lit{filter:none}
+.star.dim{filter:grayscale(1) opacity(0.4)}
+
+/* ── Timetable colors ── */
+.c-p{background:var(--pl);}.c-p .tt-sub{color:var(--p3);}.c-p .tt-info{color:var(--p2);}
+.c-b{background:var(--bl);}.c-b .tt-sub{color:#1E40AF;}.c-b .tt-info{color:#1E40AF;}
+.c-g{background:var(--gl);}.c-g .tt-sub{color:#065F46;}.c-g .tt-info{color:#065F46;}
+.c-o{background:var(--ol);}.c-o .tt-sub{color:#92400E;}.c-o .tt-info{color:#92400E;}
+
+/* ── Alert banners ── */
+.alert{border-radius:var(--rad3);padding:10px 13px;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-body{}
+.alert-title{font-size:12px;font-weight:800}
+.alert-sub{font-size:11px;margin-top:2px;font-weight:600;opacity:0.85}
+.alert.g{background:var(--gl);color:#065F46}
+.alert.r{background:var(--rl);color:#991B1B}
+.alert.o{background:var(--ol);color:#92400E}
+.alert.p{background:var(--pl);color:var(--p3)}
+.alert.b{background:var(--bl);color:#1E40AF}
+
+/* ── Quick action grid ── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.qa-item{background:var(--card);border-radius:var(--rad2);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;box-shadow:var(--sh);border:none;font-family:'Nunito',sans-serif;transition:all 0.15s}
+.qa-item:active{transform:scale(0.93);background:var(--pl)}
+.qa-icon{font-size:22px}
+.qa-label{font-size:10px;font-weight:800;color:var(--t2);text-align:center;line-height:1.2}
+
+/* ── Profile banner ── */
+.profile-banner{background:linear-gradient(135deg,var(--p),var(--p2));border-radius:var(--rad);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+.profile-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,0.07);border-radius:50%}
+.profile-banner .pav{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,0.3)}
+.profile-banner .pname{font-size:15px;font-weight:900;color:#fff;font-family:'Poppins',sans-serif}
+.profile-banner .psub{font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;font-weight:700}
+.profile-banner .pid{font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px;font-weight:700;letter-spacing:0.5px}
+
+/* ── Fee summary ── */
+.fee-summary{background:var(--pl);border-radius:var(--rad2);padding:14px;margin-bottom:12px}
+.fee-summary .ft{font-size:10px;color:var(--p);font-weight:900;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.fee-summary .fv{font-size:30px;font-weight:900;color:var(--p3);font-family:'Poppins',sans-serif;line-height:1}
+.fee-summary .fs{font-size:12px;color:var(--p2);margin-top:4px;font-weight:700}
+
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,10,40,0.6);z-index:200;justify-content:flex-end;flex-direction:column;max-width:430px;margin:0 auto;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:24px 24px 0 0;padding:0;max-height:88vh;overflow-y:auto;animation:slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.modal-header{padding:16px 20px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border2)}
+.modal-title{font-size:16px;font-weight:900;color:var(--t1)}
+.modal-close{width:30px;height:30px;background:var(--pl);border:none;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--p)}
+.modal-body{padding:16px 20px 24px}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--t1);color:#fff;padding:11px 22px;border-radius:50px;font-size:13px;font-weight:800;z-index:999;white-space:nowrap;max-width:88%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.3);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:48px 20px}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;opacity:0.5}
+.empty-state .es-title{font-size:15px;font-weight:800;color:var(--t2);margin-bottom:4px}
+.empty-state .es-sub{font-size:12px;color:var(--t3);font-weight:600}
+
+/* ── Result rows ── */
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border2)}
+.result-row:last-child{border-bottom:none}
+.result-sub{font-size:11px;color:var(--t3);margin-top:2px;font-weight:600}
+.result-mark{font-size:20px;font-weight:900;font-family:'Poppins',sans-serif}
+
+/* ── Rating display ── */
+.rating-big{text-align:center;padding:20px}
+.rating-big .rb-num{font-size:56px;font-weight:900;color:var(--p);font-family:'Poppins',sans-serif;line-height:1}
+.rating-big .rb-stars{font-size:24px;margin:4px 0}
+.rating-big .rb-sub{font-size:12px;color:var(--t3);font-weight:700}
+
+/* ── Scrollbar thin ── */
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:var(--pl2);border-radius:4px}
+
+/* ── Fee paid/due cards ── */
+.fee-card-paid{background:var(--gl);border:1.5px solid #6EE7B7;border-radius:var(--rad2);padding:14px;margin-bottom:10px}
+.fee-card-due{background:var(--rl);border:1.5px solid #FCA5A5;border-radius:var(--rad2);padding:14px;margin-bottom:10px}
+
+/* ── Spinner ── */
+.spinner{width:28px;height:28px;border:3px solid var(--pl2);border-top-color:var(--p);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Sticky date header ── */
+.date-chip{background:var(--pl);color:var(--p3);font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:12px}
+
+/* ── Mobile input number no arrows ── */
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+</style>
+</head>
+<body>
+
+<!-- ── Status Bar ── -->
+<div id="app">
+<div id="statusBar">
+  <span id="clockDisplay">9:41 AM</span>
+  <span>Swati Tutorials</span>
+  <span>📶 🔋</span>
+</div>
+
+<!-- ════════════════════════════════════════════
+     LOGIN VIEW
+════════════════════════════════════════════ -->
+<div id="loginView" class="view active" style="height:calc(100vh - 28px)">
+  <div class="login-logo">
+    <span class="icon">🎓</span>
+    <h1>Swati Tutorials</h1>
+    <p>Complete Tuition Management System</p>
+  </div>
+  <div class="login-box">
+    <h2>Welcome Back!</h2>
+    <p>Select your role to login</p>
+    <div class="role-select" id="roleSelect">
+      <div class="role-opt selected" data-role="admin" onclick="selectRole(this)">
+        <span class="ri">👑</span><div class="rl">Admin</div>
+      </div>
+      <div class="role-opt" data-role="teacher" onclick="selectRole(this)">
+        <span class="ri">👩‍🏫</span><div class="rl">Teacher</div>
+      </div>
+      <div class="role-opt" data-role="student" onclick="selectRole(this)">
+        <span class="ri">📚</span><div class="rl">Student</div>
+      </div>
+      <div class="role-opt" data-role="parent" onclick="selectRole(this)">
+        <span class="ri">👨‍👩‍👧</span><div class="rl">Parent</div>
+      </div>
+    </div>
+    <div id="phoneStep">
+      <div class="fgroup">
+        <label class="flabel">Mobile Number</label>
+        <input class="finp" type="tel" id="loginPhone" placeholder="+91 98765 43210" maxlength="13">
+      </div>
+      <button class="btn" onclick="sendOTP()">📱 Send OTP</button>
+    </div>
+    <div class="otp-box" id="otpStep">
+      <div class="demo-hint">🔑 Demo OTP: <strong>1234</strong></div>
+      <div class="fgroup">
+        <label class="flabel">Enter OTP</label>
+        <div class="otp-digits">
+          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,1)" id="o1">
+          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,2)" id="o2">
+          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,3)" id="o3">
+          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,4)" id="o4">
+        </div>
+      </div>
+      <button class="btn" onclick="verifyOTP()">✅ Verify & Login</button>
+      <button class="btn-out" onclick="backToPhone()">← Change Number</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     MAIN APP VIEW
+════════════════════════════════════════════ -->
+<div id="mainView" class="view" style="height:calc(100vh - 28px)">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="tb-row">
+      <div class="tb-left">
+        <div class="brand">Swati Tutorials</div>
+        <div class="pg-title" id="pgTitle">Admin Dashboard</div>
+        <div class="pg-sub" id="pgSub">Welcome back!</div>
+      </div>
+      <div class="tb-right">
+        <button class="icon-btn" onclick="openModal('notifModal')">🔔<div class="badge" id="notifDot"></div></button>
+        <button class="icon-btn" onclick="doLogout()">🚪</button>
+      </div>
+    </div>
+  </div>
+  <!-- Role Tabs -->
+  <div class="role-bar" id="roleBar"></div>
+  <!-- Content -->
+  <div class="content" id="contentArea">
+
+    <!-- ======================================
+         ADMIN PAGES
+    ====================================== -->
+    <!-- ADMIN: Dashboard -->
+    <div class="page" id="p-admin-dashboard">
+      <div class="sgrid" id="adminStats"></div>
+      <div class="sec-label">Quick Actions</div>
+      <div class="qa-grid">
+        <button class="qa-item" onclick="goPage('admin','enquiry')"><div class="qa-icon">📋</div><div class="qa-label">Enquiry</div></button>
+        <button class="qa-item" onclick="openAdmitModal()"><div class="qa-icon">🎓</div><div class="qa-label">Admit</div></button>
+        <button class="qa-item" onclick="goPage('admin','fees')"><div class="qa-icon">💰</div><div class="qa-label">Collect Fee</div></button>
+        <button class="qa-item" onclick="openNoticeModal()"><div class="qa-icon">📢</div><div class="qa-label">Notice</div></button>
+        <button class="qa-item" onclick="goPage('admin','batches')"><div class="qa-icon">🏫</div><div class="qa-label">Batches</div></button>
+        <button class="qa-item" onclick="goPage('admin','reports')"><div class="qa-icon">📊</div><div class="qa-label">Reports</div></button>
+        <button class="qa-item" onclick="goPage('admin','feedback')"><div class="qa-icon">⭐</div><div class="qa-label">Feedback</div></button>
+        <button class="qa-item" onclick="goPage('admin','students')"><div class="qa-icon">👥</div><div class="qa-label">Students</div></button>
+      </div>
+      <div class="sec-label">Recent Activity <span class="sa" onclick="goPage('admin','students')">See all</span></div>
+      <div id="adminActivity"></div>
+    </div>
+
+    <!-- ADMIN: Enquiry (Module 1 + 2) -->
+    <div class="page" id="p-admin-enquiry">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'enq-all')">All Enquiries</div>
+        <div class="pill" onclick="switchTab(this,'enq-demo')">Demo Schedule</div>
+        <div class="pill" onclick="switchTab(this,'enq-add')">+ Add New</div>
+      </div>
+      <div id="enq-all">
+        <div class="search-wrap"><span class="si">🔍</span><input class="finp" placeholder="Search name or mobile..." oninput="searchCards(this.value,'enq-all','.enq-card')"></div>
+        <div id="enquiryList"></div>
+      </div>
+      <div id="enq-demo" style="display:none">
+        <div id="demoList"></div>
+      </div>
+      <div id="enq-add" style="display:none">
+        <div class="card">
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Student Name *</label><input class="finp" id="enqName" placeholder="Full name"></div>
+            <div class="fgroup"><label class="flabel">Class *</label><select class="finp" id="enqClass"><option value="">Select</option><option>5th</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option></select></div>
+          </div>
+          <div class="fgroup"><label class="flabel">School Name</label><input class="finp" id="enqSchool" placeholder="School"></div>
+          <div class="fgroup"><label class="flabel">Mobile Number *</label><input class="finp" id="enqPhone" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+          <div class="fgroup"><label class="flabel">Subjects Interested</label>
+            <div class="checkbox-group">
+              <label class="chk-item"><input type="checkbox" value="Maths" class="enq-sub"><span>Maths</span></label>
+              <label class="chk-item"><input type="checkbox" value="Science" class="enq-sub"><span>Science</span></label>
+              <label class="chk-item"><input type="checkbox" value="English" class="enq-sub"><span>English</span></label>
+              <label class="chk-item"><input type="checkbox" value="History" class="enq-sub"><span>History</span></label>
+              <label class="chk-item"><input type="checkbox" value="Geography" class="enq-sub"><span>Geography</span></label>
+              <label class="chk-item"><input type="checkbox" value="All Subjects" class="enq-sub"><span>All</span></label>
+            </div>
+          </div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Source</label><select class="finp" id="enqSource"><option value="Walk-in">Walk-in</option><option value="Google">Google</option><option value="Referral">Referral</option><option value="Social Media">Social Media</option><option value="WhatsApp">WhatsApp</option></select></div>
+            <div class="fgroup"><label class="flabel">Demo Date</label><input class="finp" id="enqDemo" type="date"></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Notes</label><textarea class="finp" id="enqNotes" placeholder="Any notes..."></textarea></div>
+          <button class="btn" onclick="saveEnquiry()">➕ Add Enquiry</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN: Students (Module 3) -->
+    <div class="page" id="p-admin-students">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'stu-list')">All Students</div>
+        <div class="pill" onclick="switchTab(this,'stu-admit')">+ Admit New</div>
+      </div>
+      <div id="stu-list">
+        <div class="search-wrap"><span class="si">🔍</span><input class="finp" placeholder="Search student..." oninput="searchCards(this.value,'stu-list','.stu-card')"></div>
+        <div id="studentList"></div>
+      </div>
+      <div id="stu-admit" style="display:none">
+        <div class="card">
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Student Name *</label><input class="finp" id="admName" placeholder="Full name"></div>
+            <div class="fgroup"><label class="flabel">Class *</label><select class="finp" id="admClass"><option value="">Select</option><option>5th</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option></select></div>
+          </div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Parent Name *</label><input class="finp" id="admParent" placeholder="Parent/Guardian"></div>
+            <div class="fgroup"><label class="flabel">Contact *</label><input class="finp" id="admPhone" type="tel" placeholder="Mobile"></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Assign Batch *</label><select class="finp" id="admBatch" onchange="updateBatchLabel()"><option value="">Select batch</option></select></div>
+          <div class="fgroup"><label class="flabel">Subjects</label>
+            <div class="checkbox-group">
+              <label class="chk-item"><input type="checkbox" value="Maths" class="adm-sub" checked><span>Maths</span></label>
+              <label class="chk-item"><input type="checkbox" value="Science" class="adm-sub"><span>Science</span></label>
+              <label class="chk-item"><input type="checkbox" value="English" class="adm-sub"><span>English</span></label>
+              <label class="chk-item"><input type="checkbox" value="History" class="adm-sub"><span>History</span></label>
+              <label class="chk-item"><input type="checkbox" value="Geography" class="adm-sub"><span>Geography</span></label>
+            </div>
+          </div>
+          <div class="fgroup"><label class="flabel">Fees Plan</label><select class="finp" id="admFeesPlan"><option value="Monthly|3500">Monthly — ₹3,500/mo</option><option value="Quarterly|10000">Quarterly — ₹10,000</option><option value="Half-Yearly|19000">Half-Yearly — ₹19,000</option><option value="Annual|36000">Annual — ₹36,000</option></select></div>
+          <div class="fgroup"><label class="flabel">Admission Date</label><input class="finp" id="admDate" type="date"></div>
+          <button class="btn" onclick="admitStudent()">🎓 Admit Student</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN: Fees (Module 8) -->
+    <div class="page" id="p-admin-fees">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'fee-overview')">Overview</div>
+        <div class="pill" onclick="switchTab(this,'fee-collect')">Collect</div>
+        <div class="pill" onclick="switchTab(this,'fee-pending')">Pending</div>
+        <div class="pill" onclick="switchTab(this,'fee-history')">History</div>
+      </div>
+      <div id="fee-overview"><div id="feeOverviewContent"></div></div>
+      <div id="fee-collect" style="display:none">
+        <div class="card">
+          <div class="fgroup"><label class="flabel">Student *</label><select class="finp" id="feeStudent"><option value="">Select student</option></select></div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Amount (₹) *</label><input class="finp" id="feeAmount" type="number" placeholder="3500"></div>
+            <div class="fgroup"><label class="flabel">Month</label><input class="finp" id="feeMonth" type="month"></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Payment Mode</label><select class="finp" id="feeMode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option></select></div>
+          <div class="fgroup"><label class="flabel">Notes</label><input class="finp" id="feeNotes" placeholder="Optional notes"></div>
+          <button class="btn" onclick="collectFee()">💰 Record Payment</button>
+        </div>
+      </div>
+      <div id="fee-pending" style="display:none"><div id="feePendingContent"></div></div>
+      <div id="fee-history" style="display:none"><div id="feeHistoryContent"></div></div>
+    </div>
+
+    <!-- ADMIN: Batches (Module 4) -->
+    <div class="page" id="p-admin-batches">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'bat-list')">All Batches</div>
+        <div class="pill" onclick="switchTab(this,'bat-add')">+ Create</div>
+      </div>
+      <div id="bat-list"><div id="batchList"></div></div>
+      <div id="bat-add" style="display:none">
+        <div class="card">
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Batch Name *</label><input class="finp" id="batName" placeholder="e.g. Batch D"></div>
+            <div class="fgroup"><label class="flabel">Class *</label><select class="finp" id="batClass"><option value="">Select</option><option>5th</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option></select></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Subject</label><input class="finp" id="batSubject" placeholder="e.g. Maths, Science"></div>
+          <div class="fgroup"><label class="flabel">Teacher</label><input class="finp" id="batTeacher" placeholder="Teacher name"></div>
+          <div class="fgroup"><label class="flabel">Timing</label><input class="finp" id="batTiming" placeholder="e.g. 9:00 AM – 11:00 AM"></div>
+          <div class="fgroup"><label class="flabel">Days</label>
+            <div class="checkbox-group">
+              <label class="chk-item"><input type="checkbox" value="Mon" class="bat-day" checked><span>Mon</span></label>
+              <label class="chk-item"><input type="checkbox" value="Tue" class="bat-day" checked><span>Tue</span></label>
+              <label class="chk-item"><input type="checkbox" value="Wed" class="bat-day" checked><span>Wed</span></label>
+              <label class="chk-item"><input type="checkbox" value="Thu" class="bat-day" checked><span>Thu</span></label>
+              <label class="chk-item"><input type="checkbox" value="Fri" class="bat-day" checked><span>Fri</span></label>
+              <label class="chk-item"><input type="checkbox" value="Sat" class="bat-day"><span>Sat</span></label>
+            </div>
+          </div>
+          <div class="fgroup"><label class="flabel">Max Capacity</label><input class="finp" id="batCapacity" type="number" placeholder="40"></div>
+          <button class="btn" onclick="saveBatch()">🏫 Create Batch</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN: Notices (Module 9) -->
+    <div class="page" id="p-admin-notices">
+      <button class="btn" style="margin-bottom:12px" onclick="openNoticeModal()">📢 Send New Notice</button>
+      <div id="noticeList"></div>
+    </div>
+
+    <!-- ADMIN: Reports (Module 10) -->
+    <div class="page" id="p-admin-reports">
+      <div class="sgrid" id="reportStats"></div>
+      <div class="sec-label">Enquiry Conversion</div>
+      <div class="card" id="conversionReport"></div>
+      <div class="sec-label">Batch-wise Students</div>
+      <div id="batchReport"></div>
+      <div class="sec-label">Fee Collection Summary</div>
+      <div class="card" id="feeReport"></div>
+    </div>
+
+    <!-- ADMIN: Feedback Summary (Module 11) -->
+    <div class="page" id="p-admin-feedback">
+      <div class="card"><div class="rating-big" id="feedbackSummary"></div></div>
+      <div class="sec-label">Category Ratings</div>
+      <div class="card" id="feedbackCategories"></div>
+      <div class="sec-label">Recent Feedback</div>
+      <div id="feedbackList"></div>
+    </div>
+
+
+    <!-- ======================================
+         TEACHER PAGES
+    ====================================== -->
+    <div class="page" id="p-teacher-dashboard">
+      <div class="profile-banner" id="teacherBanner"></div>
+      <div class="sgrid" id="teacherStats"></div>
+      <div class="sec-label">Today's Schedule</div>
+      <div id="teacherSchedule"></div>
+    </div>
+
+    <!-- TEACHER: Attendance (Module 5) -->
+    <div class="page" id="p-teacher-attendance">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'att-mark')">Mark Today</div>
+        <div class="pill" onclick="switchTab(this,'att-report')">Report</div>
+      </div>
+      <div id="att-mark">
+        <div class="card" style="margin-bottom:10px">
+          <div class="fgroup" style="margin-bottom:0"><label class="flabel">Select Batch</label><select class="finp" id="attBatch" onchange="loadAttList()" style="margin:0"></select></div>
+        </div>
+        <div class="date-chip">📅 <span id="attDate"></span></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button class="btn-sm g" onclick="markAllAtt('p')">✅ All Present</button>
+          <button class="btn-sm r" onclick="markAllAtt('a')">❌ All Absent</button>
+          <button class="btn-sm s" onclick="clearAtt()">🔄 Clear</button>
+        </div>
+        <div class="card" id="attList"><div class="empty-state"><div class="es-icon">👥</div><div class="es-title">Select a batch</div></div></div>
+        <button class="btn" onclick="submitAttendance()">✅ Submit Attendance</button>
+        <p style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px;font-weight:700">📱 Parents notified automatically for absent students</p>
+      </div>
+      <div id="att-report" style="display:none"><div id="attReportContent"></div></div>
+    </div>
+
+    <!-- TEACHER: Homework (Module 6) -->
+    <div class="page" id="p-teacher-homework">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'hw-list')">Homework</div>
+        <div class="pill" onclick="switchTab(this,'hw-add')">+ Add</div>
+        <div class="pill" onclick="switchTab(this,'hw-material')">Material</div>
+      </div>
+      <div id="hw-list"><div id="homeworkList"></div></div>
+      <div id="hw-add" style="display:none">
+        <div class="card">
+          <div class="fgroup"><label class="flabel">Title *</label><input class="finp" id="hwTitle" placeholder="Homework title"></div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Subject *</label><input class="finp" id="hwSubject" placeholder="Subject"></div>
+            <div class="fgroup"><label class="flabel">Batch *</label><select class="finp" id="hwBatch"><option value="">Select</option></select></div>
+          </div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Due Date</label><input class="finp" id="hwDue" type="date"></div>
+            <div class="fgroup"><label class="flabel">Max Marks</label><input class="finp" id="hwMarks" type="number" placeholder="10"></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Description</label><textarea class="finp" id="hwDesc" placeholder="Details..."></textarea></div>
+          <div class="upload-area" onclick="toast('📎 File upload coming in v2.0!')"><div class="ua-icon">📎</div><div class="ua-text">Tap to attach PDF or Image</div></div>
+          <button class="btn" onclick="saveHomework()">📚 Assign Homework</button>
+        </div>
+      </div>
+      <div id="hw-material" style="display:none">
+        <div class="alert p"><div class="alert-icon">ℹ️</div><div class="alert-body"><div class="alert-title">Study Material</div><div class="alert-sub">Upload notes and papers for students</div></div></div>
+        <div class="upload-area" onclick="toast('📤 File upload in v2.0!')" style="margin-bottom:12px"><div class="ua-icon">📤</div><div class="ua-text">Upload PDF / Image</div></div>
+        <div id="materialList"></div>
+      </div>
+    </div>
+
+    <!-- TEACHER: Tests & Marks (Module 7) -->
+    <div class="page" id="p-teacher-tests">
+      <div class="tab-pills">
+        <div class="pill active" onclick="switchTab(this,'test-list')">Tests</div>
+        <div class="pill" onclick="switchTab(this,'test-create')">+ Create</div>
+        <div class="pill" onclick="switchTab(this,'test-marks')">Enter Marks</div>
+      </div>
+      <div id="test-list"><div id="testList"></div></div>
+      <div id="test-create" style="display:none">
+        <div class="card">
+          <div class="fgroup"><label class="flabel">Test Name *</label><input class="finp" id="testName" placeholder="e.g. Unit Test 1"></div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Subject *</label><input class="finp" id="testSubject" placeholder="Subject"></div>
+            <div class="fgroup"><label class="flabel">Batch *</label><select class="finp" id="testBatch"><option value="">Select</option></select></div>
+          </div>
+          <div class="finp-row">
+            <div class="fgroup"><label class="flabel">Date *</label><input class="finp" id="testDate" type="date"></div>
+            <div class="fgroup"><label class="flabel">Total Marks *</label><input class="finp" id="testTotal" type="number" placeholder="100"></div>
+          </div>
+          <button class="btn" onclick="createTest()">📝 Create Test</button>
+        </div>
+      </div>
+      <div id="test-marks" style="display:none">
+        <div class="card" style="margin-bottom:10px">
+          <div class="fgroup" style="margin-bottom:0"><label class="flabel">Select Test</label><select class="finp" id="marksTestSelect" onchange="loadMarksEntry()" style="margin:0"></select></div>
+        </div>
+        <div id="marksEntryArea"></div>
+      </div>
+    </div>
+
+
+    <!-- ======================================
+         STUDENT PAGES
+    ====================================== -->
+    <div class="page" id="p-student-dashboard">
+      <div class="profile-banner" id="studentBanner"></div>
+      <div class="sgrid" id="studentStats"></div>
+      <div class="sec-label">Today's Timetable</div>
+      <div id="studentTimetable"></div>
+      <div class="sec-label">Pending Homework</div>
+      <div id="studentHomework"></div>
+      <div class="sec-label">Recent Notices</div>
+      <div id="studentNotices"></div>
+    </div>
+
+    <!-- STUDENT: Results -->
+    <div class="page" id="p-student-results">
+      <div class="sec-label">My Test Results</div>
+      <div id="studentResults"></div>
+      <div class="sec-label">Performance Overview</div>
+      <div class="card" id="studentPerformance"></div>
+    </div>
+
+    <!-- STUDENT: Material -->
+    <div class="page" id="p-student-material">
+      <div class="tab-pills" id="materialSubjectTabs"></div>
+      <div id="studentMaterialContent"></div>
+      <div class="sec-label">My Homework</div>
+      <div id="studentHwList"></div>
+    </div>
+
+    <!-- STUDENT: Feedback (Module 11) -->
+    <div class="page" id="p-student-feedback">
+      <div class="card">
+        <div style="text-align:center;padding:12px 0 16px">
+          <div style="font-size:36px">⭐</div>
+          <div class="nm" style="font-size:15px;text-align:center;margin-top:6px">Monthly Feedback</div>
+          <div class="sub" style="text-align:center">Help us improve!</div>
+        </div>
+        <div class="fgroup"><label class="flabel">Teaching Quality</label><div class="stars-row" id="sr-teach" data-val="0"></div></div>
+        <div class="fgroup"><label class="flabel">Doubt Solving</label><div class="stars-row" id="sr-doubt" data-val="0"></div></div>
+        <div class="fgroup"><label class="flabel">Study Material</label><div class="stars-row" id="sr-material" data-val="0"></div></div>
+        <div class="fgroup"><label class="flabel">Overall Experience</label><div class="stars-row" id="sr-overall" data-val="0"></div></div>
+        <div class="fgroup"><label class="flabel">Suggestions / Comments</label><textarea class="finp" id="fbSuggestion" placeholder="Any feedback or suggestions..."></textarea></div>
+        <button class="btn" onclick="submitFeedback()">⭐ Submit Feedback</button>
+      </div>
+    </div>
+
+
+    <!-- ======================================
+         PARENT PAGES
+    ====================================== -->
+    <div class="page" id="p-parent-dashboard">
+      <div class="profile-banner" id="parentBanner"></div>
+      <div class="sgrid" id="parentStats"></div>
+      <div class="sec-label">Today's Attendance</div>
+      <div id="parentAttAlert"></div>
+      <div class="sec-label">Notices</div>
+      <div id="parentNotices"></div>
+    </div>
+
+    <!-- PARENT: Progress -->
+    <div class="page" id="p-parent-progress">
+      <div class="sec-label">Attendance Record</div>
+      <div class="card" id="parentAttendance"></div>
+      <div class="sec-label">Test Results</div>
+      <div id="parentResults"></div>
+      <div class="sec-label">Homework Status</div>
+      <div class="card" id="parentHomework"></div>
+      <div class="sec-label">Teacher's Remarks</div>
+      <div id="parentRemarks"></div>
+    </div>
+
+    <!-- PARENT: Fees -->
+    <div class="page" id="p-parent-fees">
+      <div id="parentFeeStatus"></div>
+      <div class="sec-label">Payment History</div>
+      <div class="card" id="parentFeeHistory"></div>
+      <button class="btn" onclick="toast('💳 Online payment integration coming soon!')">💳 Pay Online (UPI)</button>
+      <button class="btn-out" onclick="toast('📞 Calling Swati Ma\'am...')">📞 Contact Admin</button>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom Nav -->
+  <div class="bnav" id="bnav"></div>
+</div><!-- /mainView -->
+</div><!-- /app -->
+
+<!-- ════════ MODALS ════════ -->
+
+<!-- Notifications Modal -->
+<div class="modal-overlay" id="notifModal" onclick="closeModal('notifModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><div class="modal-title">🔔 Notifications</div><button class="modal-close" onclick="closeModal('notifModal')">✕</button></div>
+    <div class="modal-body" id="notifContent"></div>
+  </div>
+</div>
+
+<!-- Notice Send Modal -->
+<div class="modal-overlay" id="noticeModal" onclick="closeModal('noticeModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><div class="modal-title">📢 Send Notice</div><button class="modal-close" onclick="closeModal('noticeModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgroup"><label class="flabel">Title *</label><input class="finp" id="nTitle" placeholder="Notice title"></div>
+      <div class="fgroup"><label class="flabel">Message *</label><textarea class="finp" id="nBody" placeholder="Type your message..." style="height:100px"></textarea></div>
+      <div class="fgroup"><label class="flabel">Send To</label>
+        <select class="finp" id="nTarget">
+          <option value="all">All Students & Parents</option>
+          <option value="students">All Students Only</option>
+          <option value="parents">All Parents Only</option>
+        </select>
+      </div>
+      <button class="btn" onclick="saveNotice()">📢 Send Notice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Admit Modal (from dashboard) -->
+<div class="modal-overlay" id="admitModal" onclick="closeModal('admitModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><div class="modal-title">🎓 Quick Admit</div><button class="modal-close" onclick="closeModal('admitModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="alert p" style="margin-bottom:14px"><div class="alert-icon">💡</div><div class="alert-body"><div class="alert-title">Full form in Students tab</div><div class="alert-sub">Quick admit — basic details only</div></div></div>
+      <div class="fgroup"><label class="flabel">Name *</label><input class="finp" id="qName" placeholder="Student name"></div>
+      <div class="finp-row">
+        <div class="fgroup"><label class="flabel">Class *</label><select class="finp" id="qClass"><option value="">Select</option><option>5th</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option></select></div>
+        <div class="fgroup"><label class="flabel">Contact *</label><input class="finp" id="qPhone" type="tel" placeholder="Mobile"></div>
+      </div>
+      <div class="fgroup"><label class="flabel">Batch</label><select class="finp" id="qBatch"><option value="">Select batch</option></select></div>
+      <button class="btn" onclick="quickAdmit()">🎓 Admit Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Detail Modal -->
+<div class="modal-overlay" id="studentDetailModal" onclick="closeModal('studentDetailModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><div class="modal-title" id="sdmTitle">Student Profile</div><button class="modal-close" onclick="closeModal('studentDetailModal')">✕</button></div>
+    <div class="modal-body" id="sdmBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+</body>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  DATABASE — localStorage-backed JSON store
+// ═══════════════════════════════════════════════════════════
+const DB = {
+  _read(k){ try{return JSON.parse(localStorage.getItem('st_'+k)||'null')}catch{return null} },
+  _write(k,v){ localStorage.setItem('st_'+k, JSON.stringify(v)) },
+  get(k){ return this._read(k) },
+  set(k,v){ this._write(k,v); return v },
+  push(k,obj){ const a=this._read(k)||[]; a.push(obj); this._write(k,a); return obj },
+  update(k,id,patch){ const a=this._read(k)||[]; const i=a.findIndex(x=>x.id===id); if(i>=0){Object.assign(a[i],patch);this._write(k,a);return a[i]} return null },
+  delete(k,id){ const a=(this._read(k)||[]).filter(x=>x.id!==id); this._write(k,a) },
+  all(k){ return this._read(k)||[] }
+};
+
+// ─── ID generator ───
+let _idBase = Date.now();
+const uid = () => (++_idBase).toString(36).toUpperCase();
+
+// ─── Seed demo data ───
+function seedData(){
+  if(DB.get('seeded')) return;
+
+  // Batches
+  const bA = {id:'bA',name:'Batch A',cls:'9th',subject:'All Subjects',teacher:'Mr. R. Sharma',timing:'9:00 AM – 11:00 AM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],capacity:40,color:'p'};
+  const bB = {id:'bB',name:'Batch B',cls:'10th',subject:'All Subjects',teacher:'Ms. P. Joshi',timing:'11:00 AM – 1:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],capacity:42,color:'b'};
+  const bC = {id:'bC',name:'Batch C',cls:'8th',subject:'Maths, Science',teacher:'Mr. A. Kulkarni',timing:'2:00 PM – 4:00 PM',days:['Tue','Wed','Thu','Fri'],capacity:40,color:'g'};
+  DB.set('batches',[bA,bB,bC]);
+
+  // Students
+  const students = [
+    {id:'S001',name:'Rahul Desai',cls:'9th',parent:'Suresh Desai',phone:'9876543210',batchId:'bA',subjects:['Maths','Science','English'],feesPlan:'Monthly',feesAmount:3500,joinDate:'2025-01-10',status:'active'},
+    {id:'S002',name:'Ananya More',cls:'10th',parent:'Vijay More',phone:'9812345678',batchId:'bB',subjects:['Maths','Science','English','History'],feesPlan:'Monthly',feesAmount:3500,joinDate:'2025-01-12',status:'active'},
+    {id:'S003',name:'Rohan Jadhav',cls:'8th',parent:'Prakash Jadhav',phone:'9988776655',batchId:'bC',subjects:['Maths','Science'],feesPlan:'Quarterly',feesAmount:10000,joinDate:'2025-01-15',status:'active'},
+    {id:'S004',name:'Sneha Patil',cls:'9th',parent:'Anil Patil',phone:'9765432109',batchId:'bA',subjects:['Maths','English'],feesPlan:'Monthly',feesAmount:3500,joinDate:'2025-02-01',status:'active'},
+    {id:'S005',name:'Vishal Kulkarni',cls:'9th',parent:'Ramesh Kulkarni',phone:'9654321098',batchId:'bA',subjects:['Maths','Science','English'],feesPlan:'Monthly',feesAmount:3500,joinDate:'2025-02-05',status:'active'},
+    {id:'S006',name:'Priya Shah',cls:'10th',parent:'Dinesh Shah',phone:'9543210987',batchId:'bB',subjects:['Maths','Science'],feesPlan:'Half-Yearly',feesAmount:19000,joinDate:'2025-01-20',status:'active'},
+  ];
+  DB.set('students',students);
+
+  // Enquiries
+  DB.set('enquiries',[
+    {id:uid(),name:'Priya Patil',cls:'10th',school:'DPS Pune',phone:'9871234560',subjects:['Maths','Science'],source:'Google',status:'New',demoDate:'',notes:'Interested in evening batch',createdAt:new Date().toISOString()},
+    {id:uid(),name:'Arjun Shah',cls:'9th',school:'Vibgyor High',phone:'9812345679',subjects:['Maths','English'],source:'Referral',status:'Demo Scheduled',demoDate:'2025-04-20',notes:'',createdAt:new Date(Date.now()-86400000).toISOString()},
+    {id:uid(),name:'Kavya Nair',cls:'8th',school:'The Orchid School',phone:'9800012345',subjects:['All Subjects'],source:'Walk-in',status:'Converted',demoDate:'2025-04-10',notes:'',createdAt:new Date(Date.now()-172800000).toISOString()},
+  ]);
+
+  // Fees
+  DB.set('fees',[
+    {id:uid(),studentId:'S001',amount:3500,month:'2025-04',mode:'UPI',notes:'',paidAt:new Date().toISOString()},
+    {id:uid(),studentId:'S001',amount:3500,month:'2025-03',mode:'Cash',notes:'',paidAt:'2025-03-05T10:00:00.000Z'},
+    {id:uid(),studentId:'S003',amount:10000,month:'2025-04',mode:'Bank Transfer',notes:'Quarterly',paidAt:'2025-04-02T09:00:00.000Z'},
+    {id:uid(),studentId:'S004',amount:3500,month:'2025-04',mode:'UPI',notes:'',paidAt:'2025-04-05T11:00:00.000Z'},
+    {id:uid(),studentId:'S006',amount:19000,month:'2025-04',mode:'Cheque',notes:'Half-yearly',paidAt:'2025-04-01T09:00:00.000Z'},
+  ]);
+
+  // Attendance (today)
+  const today = todayStr();
+  DB.set('attendance',[
+    {id:uid(),date:today,batchId:'bA',records:{S001:'p',S004:'p',S005:'a'},submittedBy:'Teacher'},
+  ]);
+
+  // Homework
+  DB.set('homework',[
+    {id:'H001',title:'Trigonometry — Ex 3.4',subject:'Maths',batchId:'bA',dueDate:'2025-04-17',maxMarks:10,desc:'Complete Q1 to Q10',createdAt:new Date(Date.now()-86400000).toISOString()},
+    {id:'H002',title:'Essay — My Favourite Festival',subject:'English',batchId:'bA',dueDate:'2025-04-18',maxMarks:10,desc:'Write 200 words',createdAt:new Date(Date.now()-172800000).toISOString()},
+    {id:'H003',title:'Polynomials Practice',subject:'Maths',batchId:'bB',dueDate:'2025-04-19',maxMarks:20,desc:'Chapter 2 exercises',createdAt:new Date(Date.now()-259200000).toISOString()},
+  ]);
+
+  // Tests
+  DB.set('tests',[
+    {id:'T001',name:'Unit Test 1 — Trigonometry',subject:'Maths',batchId:'bA',date:'2025-04-12',totalMarks:100,createdAt:'2025-04-10T09:00:00.000Z'},
+    {id:'T002',name:'Chapter Test — Polynomials',subject:'Maths',batchId:'bB',date:'2025-04-08',totalMarks:100,createdAt:'2025-04-06T09:00:00.000Z'},
+  ]);
+
+  // Test Marks
+  DB.set('marks',[
+    {id:uid(),testId:'T001',studentId:'S001',marks:87,percentage:87},
+    {id:uid(),testId:'T001',studentId:'S004',marks:93,percentage:93},
+    {id:uid(),testId:'T001',studentId:'S005',marks:62,percentage:62},
+    {id:uid(),testId:'T002',studentId:'S002',marks:79,percentage:79},
+    {id:uid(),testId:'T002',studentId:'S006',marks:88,percentage:88},
+  ]);
+
+  // Notices
+  DB.set('notices',[
+    {id:uid(),title:'Unit Test — 20 to 22 Apr',body:'Unit test will be held for all students. Prepare all chapters!',target:'all',sentAt:new Date().toISOString()},
+    {id:uid(),title:'Holiday — 18 Apr (Ram Navami)',body:'No classes on 18th April due to Ram Navami festival.',target:'all',sentAt:new Date(Date.now()-86400000).toISOString()},
+    {id:uid(),title:'Batch B — Extra Class Saturday',body:'Extra doubt-clearing session on Saturday 3–5 PM for Batch B students.',target:'students',sentAt:new Date(Date.now()-172800000).toISOString()},
+  ]);
+
+  // Feedback
+  DB.set('feedback',[
+    {id:uid(),studentId:'S001',teach:5,doubt:5,material:4,overall:5,suggestion:'Ma\'am explains very well!',submittedAt:new Date(Date.now()-86400000).toISOString()},
+    {id:uid(),studentId:'S002',teach:4,doubt:4,material:4,overall:4,suggestion:'Need more practice papers.',submittedAt:new Date(Date.now()-172800000).toISOString()},
+    {id:uid(),studentId:'S004',teach:5,doubt:5,material:5,overall:5,suggestion:'Best tuition classes!',submittedAt:new Date(Date.now()-259200000).toISOString()},
+  ]);
+
+  // Notifications
+  DB.set('notifications',[
+    {id:uid(),msg:'Fee paid — Rahul Desai ₹3,500',icon:'💰',time:new Date().toISOString(),read:false},
+    {id:uid(),msg:'New enquiry — Priya Patil (10th)',icon:'📋',time:new Date(Date.now()-3600000).toISOString(),read:false},
+    {id:uid(),msg:'Attendance submitted — Batch A',icon:'✅',time:new Date(Date.now()-86400000).toISOString(),read:true},
+    {id:uid(),msg:'New feedback received ⭐⭐⭐⭐⭐',icon:'⭐',time:new Date(Date.now()-172800000).toISOString(),read:true},
+  ]);
+
+  // Users (login credentials)
+  DB.set('users',[
+    {id:'U001',role:'admin',name:"Swati Ma'am",sub:'Owner & Admin',phone:'9999999999',pin:'1234'},
+    {id:'U002',role:'teacher',name:'Mr. R. Sharma',sub:'Mathematics Teacher',phone:'8888888888',pin:'1234'},
+    {id:'U003',role:'student',name:'Rahul Desai',sub:'9th Std • Batch A',phone:'9876543210',pin:'1234',studentId:'S001'},
+    {id:'U004',role:'parent',name:'Suresh Desai',sub:'Parent of Rahul Desai',phone:'9876543210',pin:'1234',studentId:'S001'},
+  ]);
+
+  DB.set('seeded',true);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTH STATE
+// ═══════════════════════════════════════════════════════════
+let currentUser = null;
+let selectedLoginRole = 'admin';
+
+function selectRole(el){
+  document.querySelectorAll('.role-opt').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedLoginRole = el.dataset.role;
+}
+
+function sendOTP(){
+  const ph = document.getElementById('loginPhone').value.trim();
+  if(!ph){toast('⚠️ Enter mobile number'); return;}
+  document.getElementById('phoneStep').style.display='none';
+  document.getElementById('otpStep').style.display='block';
+  document.getElementById('o1').focus();
+  toast('📱 OTP sent! (use 1234 for demo)');
+}
+
+function otpNext(el,idx){
+  if(el.value.length>=1 && idx<4) document.getElementById('o'+(idx+1)).focus();
+  if(idx===4) verifyOTP();
+}
+
+function backToPhone(){
+  document.getElementById('otpStep').style.display='none';
+  document.getElementById('phoneStep').style.display='block';
+  [1,2,3,4].forEach(i=>document.getElementById('o'+i).value='');
+}
+
+function verifyOTP(){
+  const otp = [1,2,3,4].map(i=>document.getElementById('o'+i).value).join('');
+  if(otp!=='1234'){toast('❌ Wrong OTP. Use 1234'); return;}
+  const users = DB.all('users');
+  const user = users.find(u=>u.role===selectedLoginRole);
+  if(!user){toast('❌ No user found for this role'); return;}
+  currentUser = user;
+  DB.set('session',user);
+  launchApp();
+}
+
+function doLogout(){
+  currentUser = null;
+  DB.set('session',null);
+  document.getElementById('loginView').classList.add('active');
+  document.getElementById('mainView').classList.remove('active');
+  backToPhone();
+  document.getElementById('loginPhone').value='';
+  selectedLoginRole='admin';
+  document.querySelectorAll('.role-opt').forEach(e=>e.classList.remove('selected'));
+  document.querySelector('.role-opt[data-role="admin"]').classList.add('selected');
+  toast('👋 Logged out');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  APP LAUNCH
+// ═══════════════════════════════════════════════════════════
+const ROLE_CONFIG = {
+  admin:{
+    label:'Admin',icon:'👑',
+    tabs:[
+      {id:'dashboard',icon:'🏠',label:'Home'},
+      {id:'enquiry',icon:'📋',label:'Enquiry'},
+      {id:'students',icon:'👥',label:'Students'},
+      {id:'fees',icon:'💰',label:'Fees'},
+      {id:'notices',icon:'📢',label:'Notices'},
+    ]
+  },
+  teacher:{
+    label:'Teacher',icon:'👩‍🏫',
+    tabs:[
+      {id:'dashboard',icon:'🏠',label:'Home'},
+      {id:'attendance',icon:'✅',label:'Attendance'},
+      {id:'homework',icon:'📚',label:'Homework'},
+      {id:'tests',icon:'📝',label:'Tests'},
+    ]
+  },
+  student:{
+    label:'Student',icon:'📚',
+    tabs:[
+      {id:'dashboard',icon:'🏠',label:'Home'},
+      {id:'results',icon:'📊',label:'Results'},
+      {id:'material',icon:'📖',label:'Material'},
+      {id:'feedback',icon:'⭐',label:'Feedback'},
+    ]
+  },
+  parent:{
+    label:'Parent',icon:'👨‍👩‍👧',
+    tabs:[
+      {id:'dashboard',icon:'🏠',label:'Home'},
+      {id:'progress',icon:'📈',label:'Progress'},
+      {id:'fees',icon:'💰',label:'Fees'},
+    ]
+  }
+};
+
+let currentRole='admin', currentPage='dashboard';
+
+function launchApp(){
+  document.getElementById('loginView').classList.remove('active');
+  document.getElementById('mainView').classList.add('active');
+  buildRoleBar();
+  buildBottomNav();
+  updateTopBar();
+  goPage(currentUser.role,'dashboard');
+  updateClock();
+  updateNotifBadge();
+}
+
+function buildRoleBar(){
+  const bar = document.getElementById('roleBar');
+  bar.innerHTML='';
+  if(currentUser.role==='admin'){
+    // Admin can switch views (for demo/management)
+    Object.entries(ROLE_CONFIG).forEach(([r,cfg])=>{
+      const btn=document.createElement('button');
+      btn.className='rtab'+(r===currentRole?' active':'');
+      btn.textContent=cfg.icon+' '+cfg.label;
+      btn.onclick=()=>switchRole(r);
+      bar.appendChild(btn);
+    });
+  } else {
+    // Non-admin sees only their own role
+    const cfg=ROLE_CONFIG[currentUser.role];
+    const btn=document.createElement('button');
+    btn.className='rtab active';
+    btn.textContent=cfg.icon+' '+cfg.label;
+    bar.appendChild(btn);
+  }
+}
+
+function switchRole(r){
+  currentRole=r;
+  document.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.rtab').forEach(b=>{if(b.textContent.includes(ROLE_CONFIG[r].label))b.classList.add('active');});
+  buildBottomNav();
+  goPage(r,'dashboard');
+}
+
+function buildBottomNav(){
+  const nav=document.getElementById('bnav');
+  nav.innerHTML='';
+  ROLE_CONFIG[currentRole].tabs.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='nb'+(t.id===currentPage?' active':'');
+    b.innerHTML=`<div class="ni">${t.icon}</div><span>${t.label}</span>`;
+    b.onclick=()=>goPage(currentRole,t.id);
+    nav.appendChild(b);
+  });
+}
+
+function goPage(role,pageId){
+  currentRole=role; currentPage=pageId;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const p=document.getElementById('p-'+role+'-'+pageId);
+  if(p){ p.classList.add('active'); document.getElementById('contentArea').scrollTop=0; }
+  updateTopBar();
+  buildBottomNav();
+  renderPage(role,pageId);
+}
+
+function updateTopBar(){
+  const cfg=ROLE_CONFIG[currentRole];
+  const u=currentUser;
+  document.getElementById('pgTitle').textContent=cfg.label+' — '+(currentPage.charAt(0).toUpperCase()+currentPage.slice(1));
+  document.getElementById('pgSub').textContent=u.name+' • '+u.sub;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PAGE RENDERERS
+// ═══════════════════════════════════════════════════════════
+function renderPage(role,page){
+  const fn=renderers[role+'_'+page];
+  if(fn) fn();
+}
+
+const renderers = {
+
+  // ──────────── ADMIN ────────────
+  admin_dashboard(){
+    const students=DB.all('students');
+    const fees=DB.all('fees');
+    const notices=DB.all('notices');
+    const enquiries=DB.all('enquiries');
+    // Stats
+    const totalCollected=fees.reduce((s,f)=>s+f.amount,0);
+    const paidStudentIds=new Set(fees.map(f=>f.studentId));
+    const pendingCount=students.filter(s=>!paidStudentIds.has(s.id)).length;
+    const pendingAmount=students.filter(s=>!paidStudentIds.has(s.id)).reduce((s,st)=>s+st.feesAmount,0);
+    document.getElementById('adminStats').innerHTML=`
+      <div class="sc" data-icon="👥"><div class="sl">Total Students</div><div class="sv">${students.length}</div><div class="ss st up">Active this month</div></div>
+      <div class="sc" data-icon="💰"><div class="sl">Fees Collected</div><div class="sv">₹${(totalCollected/1000).toFixed(0)}K</div><div class="ss">This period</div></div>
+      <div class="sc" data-icon="⚠️"><div class="sl">Pending Fees</div><div class="sv" style="color:var(--r)">₹${(pendingAmount/1000).toFixed(0)}K</div><div class="ss st dn">${pendingCount} students</div></div>
+      <div class="sc" data-icon="📋"><div class="sl">Enquiries</div><div class="sv">${enquiries.length}</div><div class="ss">${enquiries.filter(e=>e.status==='New').length} new</div></div>
+    `;
+    // Activity
+    const enqs=DB.all('enquiries').slice(-3).reverse();
+    const hw=DB.all('homework').slice(-2).reverse();
+    let html='<div class="card"><div class="tl">';
+    enqs.forEach(e=>html+=`<div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><div class="tl-title">Enquiry: ${e.name} (${e.cls})</div><div class="tl-sub">${e.source} • ${e.status} • ${fmtTime(e.createdAt)}</div></div></div>`);
+    fees.slice(-2).reverse().forEach(f=>{const s=getStudent(f.studentId);html+=`<div class="tl-item"><div class="tl-dot g"></div><div class="tl-body"><div class="tl-title">Fee paid — ${s?.name||'Unknown'} ₹${f.amount.toLocaleString()}</div><div class="tl-sub">${f.mode} • ${fmtTime(f.paidAt)}</div></div></div>`;});
+    html+='</div></div>';
+    document.getElementById('adminActivity').innerHTML=html;
+    populateBatchSelect('qBatch');
+  },
+
+  admin_enquiry(){
+    renderEnquiryList();
+    renderDemoList();
+  },
+
+  admin_students(){
+    renderStudentList();
+    populateBatchSelect('admBatch');
+    if(!document.getElementById('admDate').value) document.getElementById('admDate').value=todayStr();
+  },
+
+  admin_fees(){
+    renderFeeOverview();
+    renderFeePending();
+    renderFeeHistory();
+    populateStudentSelect('feeStudent');
+    if(!document.getElementById('feeMonth').value) document.getElementById('feeMonth').value=todayStr().slice(0,7);
+  },
+
+  admin_batches(){
+    renderBatchList();
+  },
+
+  admin_notices(){
+    renderNoticeList();
+  },
+
+  admin_reports(){
+    const students=DB.all('students');
+    const enqs=DB.all('enquiries');
+    const fees=DB.all('fees');
+    const batches=DB.all('batches');
+    const totalFees=fees.reduce((s,f)=>s+f.amount,0);
+    const converted=enqs.filter(e=>e.status==='Converted').length;
+    document.getElementById('reportStats').innerHTML=`
+      <div class="sc" data-icon="👥"><div class="sl">Students</div><div class="sv">${students.length}</div></div>
+      <div class="sc" data-icon="📋"><div class="sl">Enquiries</div><div class="sv">${enqs.length}</div></div>
+      <div class="sc" data-icon="🔄"><div class="sl">Converted</div><div class="sv" style="color:var(--gc)">${converted}</div></div>
+      <div class="sc" data-icon="💰"><div class="sl">Collected</div><div class="sv">₹${(totalFees/1000).toFixed(0)}K</div></div>
+    `;
+    const convPct=enqs.length?Math.round(converted/enqs.length*100):0;
+    document.getElementById('conversionReport').innerHTML=`
+      <div class="prog-wrap"><div class="prog-label"><span>Total Enquiries</span><span>${enqs.length}</span></div></div>
+      <div class="prog-wrap"><div class="prog-label"><span style="color:var(--gc)">Converted (${convPct}%)</span><span style="color:var(--gc)">${converted}</span></div><div class="prog-bar"><div class="prog-fill g" style="width:${convPct}%"></div></div></div>
+      <div class="prog-wrap"><div class="prog-label"><span style="color:var(--o)">Demo Pending</span><span style="color:var(--o)">${enqs.filter(e=>e.status==='Demo Scheduled').length}</span></div><div class="prog-bar"><div class="prog-fill o" style="width:${enqs.length?Math.round(enqs.filter(e=>e.status==='Demo Scheduled').length/enqs.length*100):0}%"></div></div></div>
+    `;
+    let bHtml='';
+    batches.forEach(b=>{const cnt=students.filter(s=>s.batchId===b.id).length; const pct=Math.round(cnt/b.capacity*100);
+      bHtml+=`<div class="card"><div class="prog-wrap"><div class="prog-label"><span style="font-weight:800">${b.name} — ${b.cls}</span><span>${cnt}/${b.capacity}</span></div><div class="prog-bar"><div class="prog-fill ${pct>=100?'r':pct>80?'o':''}" style="width:${Math.min(pct,100)}%"></div></div></div></div>`;
+    });
+    document.getElementById('batchReport').innerHTML=bHtml||'<div class="empty-state"><div class="es-icon">🏫</div><div class="es-title">No batches yet</div></div>';
+    document.getElementById('feeReport').innerHTML=`
+      <div class="row b"><span class="rk">Total Collected</span><span class="rv" style="color:var(--gc)">₹${totalFees.toLocaleString()}</span></div>
+      <div class="row b"><span class="rk">No. of Payments</span><span class="rv">${fees.length}</span></div>
+      <div class="row b"><span class="rk">Cash Payments</span><span class="rv">${fees.filter(f=>f.mode==='Cash').length}</span></div>
+      <div class="row"><span class="rk">UPI Payments</span><span class="rv">${fees.filter(f=>f.mode==='UPI').length}</span></div>
+    `;
+  },
+
+  admin_feedback(){
+    const fb=DB.all('feedback');
+    if(!fb.length){
+      document.getElementById('feedbackSummary').innerHTML='<div class="es-icon">⭐</div><div class="es-title">No feedback yet</div>';
+      document.getElementById('feedbackCategories').innerHTML='';
+      document.getElementById('feedbackList').innerHTML='';
+      return;
+    }
+    const avg=(arr)=>(arr.reduce((s,v)=>s+v,0)/arr.length).toFixed(1);
+    const all5=(k)=>fb.map(f=>f[k]);
+    const overall=avg(all5('overall'));
+    document.getElementById('feedbackSummary').innerHTML=`<div class="rb-num">${overall}</div><div class="rb-stars">${'⭐'.repeat(Math.round(overall))}</div><div class="rb-sub">${fb.length} responses received</div>`;
+    document.getElementById('feedbackCategories').innerHTML=`
+      <div class="prog-wrap"><div class="prog-label"><span>Teaching Quality</span><span style="color:var(--gc)">${avg(all5('teach'))}/5</span></div><div class="prog-bar"><div class="prog-fill" style="width:${avg(all5('teach'))*20}%"></div></div></div>
+      <div class="prog-wrap"><div class="prog-label"><span>Doubt Solving</span><span style="color:var(--gc)">${avg(all5('doubt'))}/5</span></div><div class="prog-bar"><div class="prog-fill" style="width:${avg(all5('doubt'))*20}%"></div></div></div>
+      <div class="prog-wrap"><div class="prog-label"><span>Study Material</span><span style="color:var(--gc)">${avg(all5('material'))}/5</span></div><div class="prog-bar"><div class="prog-fill" style="width:${avg(all5('material'))*20}%"></div></div></div>
+      <div class="prog-wrap"><div class="prog-label"><span>Overall Experience</span><span style="color:var(--gc)">${avg(all5('overall'))}/5</span></div><div class="prog-bar"><div class="prog-fill" style="width:${avg(all5('overall'))*20}%"></div></div></div>
+    `;
+    let html='';
+    fb.slice().reverse().forEach(f=>{const s=getStudent(f.studentId);
+      html+=`<div class="notice-card"><div class="nt">${'⭐'.repeat(f.overall)} ${s?.name||'Anonymous'}</div><div class="nb">${f.suggestion||'—'}</div><div class="nm">${fmtDate(f.submittedAt)}</div></div>`;
+    });
+    document.getElementById('feedbackList').innerHTML=html;
+  },
+
+  // ──────────── TEACHER ────────────
+  teacher_dashboard(){
+    const u=currentUser;
+    document.getElementById('teacherBanner').innerHTML=`<div class="pav">${initials(u.name)}</div><div><div class="pname">${u.name}</div><div class="psub">${u.sub}</div><div class="pid">Mathematics • Batch A & B</div></div>`;
+    const students=DB.all('students');
+    const hw=DB.all('homework');
+    const tests=DB.all('tests');
+    document.getElementById('teacherStats').innerHTML=`
+      <div class="sc" data-icon="👥"><div class="sl">My Students</div><div class="sv">${students.length}</div><div class="ss">All batches</div></div>
+      <div class="sc" data-icon="📚"><div class="sl">Homework</div><div class="sv">${hw.length}</div><div class="ss">Assigned</div></div>
+      <div class="sc" data-icon="📝"><div class="sl">Tests</div><div class="sv">${tests.length}</div><div class="ss">Created</div></div>
+      <div class="sc" data-icon="📅"><div class="sl">Today</div><div class="sv" style="font-size:16px">${new Date().toLocaleDateString('en-IN',{weekday:'short'})}</div><div class="ss">${todayStr()}</div></div>
+    `;
+    document.getElementById('teacherSchedule').innerHTML=`
+      <div class="tt-row"><div class="tt-time">9:00 AM</div><div class="tt-block c-p"><div class="tt-sub">Batch A — Trigonometry</div><div class="tt-info">9th Std • 38 students</div></div></div>
+      <div class="tt-row"><div class="tt-time">11:00 AM</div><div class="tt-block c-b"><div class="tt-sub">Batch B — Polynomials</div><div class="tt-info">10th Std • 42 students</div></div></div>
+      <div class="tt-row"><div class="tt-time">2:00 PM</div><div class="tt-block c-g"><div class="tt-sub">Doubt Clearing Session</div><div class="tt-info">Open for all batches</div></div></div>
+    `;
+    // Populate batch selects
+    populateBatchSelect('attBatch');
+    populateBatchSelect('hwBatch');
+    populateBatchSelect('testBatch');
+    document.getElementById('attDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  },
+
+  teacher_attendance(){
+    populateBatchSelect('attBatch');
+    document.getElementById('attDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    renderAttReport();
+  },
+
+  teacher_homework(){
+    renderHomeworkList();
+    populateBatchSelect('hwBatch');
+    renderMaterialList();
+  },
+
+  teacher_tests(){
+    renderTestList();
+    populateBatchSelect('testBatch');
+    loadMarksDropdown();
+  },
+
+  // ──────────── STUDENT ────────────
+  student_dashboard(){
+    const sid=currentUser.studentId||'S001';
+    const s=getStudent(sid);
+    const batch=getBatch(s?.batchId);
+    document.getElementById('studentBanner').innerHTML=`<div class="pav">${initials(s?.name||'S')}</div><div><div class="pname">${s?.name||'Student'}</div><div class="psub">${s?.cls} Std • ${batch?.name||''}</div><div class="pid">ID: ${sid}</div></div>`;
+    const fees=DB.all('fees').filter(f=>f.studentId===sid);
+    const att=getStudentAttendance(sid);
+    document.getElementById('studentStats').innerHTML=`
+      <div class="sc" data-icon="✅"><div class="sl">Attendance</div><div class="sv" style="color:var(--gc)">${att.pct}%</div><div class="ss">${att.p}/${att.total} classes</div></div>
+      <div class="sc" data-icon="💰"><div class="sl">Fee Status</div><div class="sv" style="font-size:15px;color:var(--gc)">${fees.length?'✅ Paid':'⚠️ Due'}</div><div class="ss">${fees.length?'This month':'Pay now'}</div></div>
+    `;
+    document.getElementById('studentTimetable').innerHTML=`
+      <div class="tt-row"><div class="tt-time">9:00 AM</div><div class="tt-block c-p"><div class="tt-sub">Mathematics</div><div class="tt-info">Mr. Sharma • ${batch?.name||''}</div></div></div>
+      <div class="tt-row"><div class="tt-time">10:30 AM</div><div class="tt-block c-b"><div class="tt-sub">Science</div><div class="tt-info">Ms. Joshi</div></div></div>
+      <div class="tt-row"><div class="tt-time">12:00 PM</div><div class="tt-block c-g"><div class="tt-sub">English</div><div class="tt-info">Mr. Kulkarni</div></div></div>
+    `;
+    const hw=DB.all('homework').filter(h=>h.batchId===s?.batchId);
+    document.getElementById('studentHomework').innerHTML=hw.length?hw.map(h=>`<div class="hw-card"><div class="hw-icon">📝</div><div><div class="hs">${h.title}</div><div class="hd">${h.subject} • Due: ${fmtDate(h.dueDate)} • ${h.desc}</div></div></div>`).join(''):'<div class="empty-state"><div class="es-icon">✅</div><div class="es-title">No pending homework!</div></div>';
+    const notices=DB.all('notices').slice(-3).reverse();
+    document.getElementById('studentNotices').innerHTML=notices.map(n=>`<div class="notice-card"><div class="nt">${n.title}</div><div class="nb">${n.body}</div><div class="nm">${fmtTime(n.sentAt)}</div></div>`).join('');
+  },
+
+  student_results(){
+    const sid=currentUser.studentId||'S001';
+    const marks=DB.all('marks').filter(m=>m.studentId===sid);
+    const tests=DB.all('tests');
+    if(!marks.length){document.getElementById('studentResults').innerHTML='<div class="empty-state"><div class="es-icon">📊</div><div class="es-title">No results yet</div></div>';return;}
+    let html='';
+    marks.forEach(m=>{const t=tests.find(x=>x.id===m.testId);if(!t)return;
+      const clr=m.percentage>=75?'var(--gc)':m.percentage>=50?'var(--o)':'var(--r)';
+      html+=`<div class="card"><div class="result-row"><div><div class="nm">${t.name}</div><div class="result-sub">${t.subject} • ${fmtDate(t.date)}</div></div><div class="result-mark" style="color:${clr}">${m.marks}/${t.totalMarks}</div></div><div class="prog-bar" style="margin-top:8px"><div class="prog-fill ${m.percentage>=75?'g':m.percentage>=50?'o':'r'}" style="width:${m.percentage}%"></div></div><div style="font-size:11px;color:var(--t3);margin-top:4px;font-weight:700">${m.percentage}% • ${grade(m.percentage)}</div></div>`;
+    });
+    document.getElementById('studentResults').innerHTML=html;
+    const avg=Math.round(marks.reduce((s,m)=>s+m.percentage,0)/marks.length);
+    document.getElementById('studentPerformance').innerHTML=`
+      <div class="prog-wrap"><div class="prog-label"><span>Overall Average</span><span style="color:var(--gc)">${avg}%</span></div><div class="prog-bar"><div class="prog-fill ${avg>=75?'g':avg>=50?'o':'r'}" style="width:${avg}%"></div></div></div>
+      <div style="text-align:center;font-size:13px;font-weight:800;color:var(--t2);margin-top:8px">Grade: ${grade(avg)}</div>
+    `;
+  },
+
+  student_material(){
+    const sid=currentUser.studentId||'S001';
+    const s=getStudent(sid);
+    const hw=DB.all('homework').filter(h=>h.batchId===s?.batchId);
+    const subjects=[...new Set(hw.map(h=>h.subject))];
+    document.getElementById('materialSubjectTabs').innerHTML=subjects.map((sub,i)=>`<div class="pill${i===0?' active':''}" onclick="switchTab(this,'mat-${i}')">${sub}</div>`).join('');
+    let content='';
+    subjects.forEach((sub,i)=>{ content+=`<div id="mat-${i}" style="${i>0?'display:none':''}">`+[`📄 ${sub} — Chapter Notes`,`📄 ${sub} — Practice Paper`,`📄 Previous Year Paper`].map(t=>`<div class="card"><div class="row"><span class="rk">${t}</span><span class="rv" style="color:var(--p);cursor:pointer" onclick="toast('📄 File download in v2.0!')" >Download</span></div></div>`).join('')+'</div>'; });
+    document.getElementById('studentMaterialContent').innerHTML=content||'<div class="empty-state"><div class="es-icon">📖</div><div class="es-title">No material uploaded yet</div></div>';
+    document.getElementById('studentHwList').innerHTML=hw.map(h=>`<div class="hw-card"><div class="hw-icon">📝</div><div><div class="hs">${h.title}</div><div class="hd">${h.subject} • Due: ${fmtDate(h.dueDate)}</div></div></div>`).join('')||'<div class="empty-state"><div class="es-icon">✅</div><div class="es-title">No homework!</div></div>';
+    // Init star ratings
+    ['teach','doubt','material','overall'].forEach(k=>buildStars(k));
+  },
+
+  student_feedback(){
+    ['teach','doubt','material','overall'].forEach(k=>buildStars(k));
+  },
+
+  // ──────────── PARENT ────────────
+  parent_dashboard(){
+    const sid=currentUser.studentId||'S001';
+    const s=getStudent(sid);
+    const batch=getBatch(s?.batchId);
+    document.getElementById('parentBanner').innerHTML=`<div class="pav">${initials(currentUser.name)}</div><div><div class="pname">${currentUser.name}</div><div class="psub">Parent of ${s?.name||'Student'}</div><div class="pid">${batch?.name||''} • ${s?.cls} Std</div></div>`;
+    const fees=DB.all('fees').filter(f=>f.studentId===sid);
+    const att=getStudentAttendance(sid);
+    const marks=DB.all('marks').filter(m=>m.studentId===sid);
+    const lastMark=marks[marks.length-1];
+    const lastTest=lastMark?DB.all('tests').find(t=>t.id===lastMark.testId):null;
+    document.getElementById('parentStats').innerHTML=`
+      <div class="sc" data-icon="✅"><div class="sl">Attendance</div><div class="sv" style="color:var(--gc)">${att.pct}%</div><div class="ss">${att.p}/${att.total}</div></div>
+      <div class="sc" data-icon="💰"><div class="sl">Fee Status</div><div class="sv" style="font-size:14px;color:${fees.length?'var(--gc)':'var(--r)'}">${fees.length?'✅ Paid':'⚠️ Due'}</div></div>
+      <div class="sc" data-icon="📊"><div class="sl">Last Test</div><div class="sv" style="font-size:18px">${lastMark?lastMark.marks+'/'+lastTest?.totalMarks:'—'}</div><div class="ss">${lastTest?.subject||''}</div></div>
+      <div class="sc" data-icon="📅"><div class="sl">Next Class</div><div class="sv" style="font-size:18px">${batch?.timing?.split('–')[0]?.trim()||'—'}</div><div class="ss">Tomorrow</div></div>
+    `;
+    // Today attendance alert
+    const todayAtt=DB.all('attendance').find(a=>a.date===todayStr()&&a.batchId===s?.batchId);
+    const todayStatus=todayAtt?.records?.[sid];
+    document.getElementById('parentAttAlert').innerHTML=todayStatus==='p'
+      ?`<div class="alert g"><div class="alert-icon">✅</div><div class="alert-body"><div class="alert-title">Present Today</div><div class="alert-sub">${s?.name} attended all classes today</div></div></div>`
+      :todayStatus==='a'
+      ?`<div class="alert r"><div class="alert-icon">❌</div><div class="alert-body"><div class="alert-title">Absent Today</div><div class="alert-sub">${s?.name} was absent today</div></div></div>`
+      :`<div class="alert b"><div class="alert-icon">📋</div><div class="alert-body"><div class="alert-title">Attendance Not Marked Yet</div><div class="alert-sub">Will update once teacher marks attendance</div></div></div>`;
+    const notices=DB.all('notices').slice(-4).reverse();
+    document.getElementById('parentNotices').innerHTML=notices.map(n=>`<div class="notice-card"><div class="nt">${n.title}</div><div class="nb">${n.body}</div><div class="nm">${fmtTime(n.sentAt)}</div></div>`).join('');
+  },
+
+  parent_progress(){
+    const sid=currentUser.studentId||'S001';
+    const s=getStudent(sid);
+    const att=getStudentAttendance(sid);
+    document.getElementById('parentAttendance').innerHTML=`
+      <div class="prog-wrap"><div class="prog-label"><span style="font-weight:800">Overall Attendance</span><span style="font-weight:800;color:${att.pct>=75?'var(--gc)':'var(--r)'}">${att.pct}%</span></div><div class="prog-bar"><div class="prog-fill ${att.pct>=75?'g':'r'}" style="width:${att.pct}%"></div></div></div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px;font-weight:700">${att.p} out of ${att.total} classes attended</div>
+    `;
+    const marks=DB.all('marks').filter(m=>m.studentId===sid);
+    const tests=DB.all('tests');
+    let html='';
+    marks.forEach(m=>{const t=tests.find(x=>x.id===m.testId);if(!t)return;
+      const clr=m.percentage>=75?'var(--gc)':m.percentage>=50?'var(--o)':'var(--r)';
+      html+=`<div class="card"><div class="result-row"><div><div class="nm" style="font-size:13px">${t.name}</div><div class="result-sub">${t.subject} • ${fmtDate(t.date)}</div></div><div class="result-mark" style="color:${clr};font-size:18px">${m.marks}/${t.totalMarks}</div></div></div>`;
+    });
+    document.getElementById('parentResults').innerHTML=html||'<div class="empty-state"><div class="es-icon">📊</div><div class="es-title">No results yet</div></div>';
+    const hw=DB.all('homework').filter(h=>h.batchId===s?.batchId);
+    document.getElementById('parentHomework').innerHTML=hw.length?hw.map(h=>`<div class="row b"><span class="rk">${h.title} (${h.subject})</span><span class="bdg bdg-o">Pending</span></div>`).join(''):' <div style="font-size:13px;color:var(--gc);font-weight:700;text-align:center;padding:8px">No pending homework!</div>';
+    document.getElementById('parentRemarks').innerHTML=`<div class="notice-card"><div class="nt">Mr. R. Sharma (Maths)</div><div class="nb">${s?.name} is performing well. Focus needed on consistent practice. Attendance is excellent!</div><div class="nm">14 Apr 2025</div></div>`;
+  },
+
+  parent_fees(){
+    const sid=currentUser.studentId||'S001';
+    const s=getStudent(sid);
+    const fees=DB.all('fees').filter(f=>f.studentId===sid);
+    const thisMonth=fees.find(f=>f.month===todayStr().slice(0,7));
+    document.getElementById('parentFeeStatus').innerHTML=thisMonth
+      ?`<div class="fee-card-paid"><div class="row"><span class="rk" style="color:#065F46;font-weight:800">April 2025</span><span class="bdg bdg-g">✅ Paid</span></div><div class="row"><span class="rk">Amount</span><span class="rv" style="color:#065F46;font-size:20px">₹${thisMonth.amount.toLocaleString()}</span></div><div class="row"><span class="rk">Mode</span><span class="rv">${thisMonth.mode}</span></div><div class="row"><span class="rk">Date</span><span class="rv">${fmtDate(thisMonth.paidAt)}</span></div></div>`
+      :`<div class="fee-card-due"><div class="row"><span class="rk" style="color:#991B1B;font-weight:800">April 2025</span><span class="bdg bdg-r">⚠️ Due</span></div><div class="row"><span class="rk">Amount</span><span class="rv" style="color:#991B1B;font-size:20px">₹${s?.feesAmount?.toLocaleString()||'3,500'}</span></div></div>`;
+    document.getElementById('parentFeeHistory').innerHTML=fees.slice().reverse().map(f=>`<div class="row b"><span class="rk">${f.month} • ${f.mode}</span><span class="bdg bdg-g">₹${f.amount.toLocaleString()}</span></div>`).join('')||'<div style="font-size:13px;color:var(--t3);text-align:center;padding:8px;font-weight:700">No payment history</div>';
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+//  HELPER RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+function renderEnquiryList(){
+  const enqs=DB.all('enquiries');
+  const statusColor={New:'bdg-o','Demo Scheduled':'bdg-b',Converted:'bdg-g','Not Interested':'bdg-r'};
+  document.getElementById('enquiryList').innerHTML=enqs.length?enqs.slice().reverse().map(e=>`
+    <div class="card enq-card" data-name="${e.name.toLowerCase()}">
+      <div class="card-head"><div class="av" style="background:var(--pl);color:var(--p3)">${initials(e.name)}</div>
+        <div><div class="nm">${e.name}</div><div class="sub">${e.cls} Std • 📞 ${e.phone}</div></div>
+        <span class="bdg ${statusColor[e.status]||'bdg-p'} mla">${e.status}</span>
+      </div>
+      <div class="divider"></div>
+      <div class="row"><span class="rk">School</span><span class="rv">${e.school||'—'}</span></div>
+      <div class="row"><span class="rk">Subjects</span><span class="rv">${(e.subjects||[]).join(', ')||'—'}</span></div>
+      <div class="row"><span class="rk">Source</span><span class="rv">${e.source}</span></div>
+      ${e.demoDate?`<div class="row"><span class="rk">Demo Date</span><span class="rv">📅 ${fmtDate(e.demoDate)}</span></div>`:''}
+      <div class="btn-row">
+        ${e.status==='New'?`<button class="btn-sm" onclick="scheduleDemo('${e.id}')">📅 Schedule Demo</button>`:''}
+        ${e.status!=='Converted'&&e.status!=='Not Interested'?`<button class="btn-sm g" onclick="convertEnquiry('${e.id}')">✅ Convert</button>`:''}
+        ${e.status!=='Not Interested'&&e.status!=='Converted'?`<button class="btn-sm r" onclick="markNI('${e.id}')">❌ Not Interested</button>`:''}
+      </div>
+    </div>`).join('')
+    :'<div class="empty-state"><div class="es-icon">📋</div><div class="es-title">No enquiries yet</div><div class="es-sub">Add your first enquiry!</div></div>';
+}
+
+function renderDemoList(){
+  const demos=DB.all('enquiries').filter(e=>e.demoDate);
+  document.getElementById('demoList').innerHTML=demos.length?demos.map(e=>`
+    <div class="card">
+      <div class="card-head"><div class="av" style="background:var(--bl);color:#1E40AF">${initials(e.name)}</div>
+        <div><div class="nm">${e.name}</div><div class="sub">${e.cls} Std • ${e.status}</div></div>
+        <span class="bdg bdg-b mla">📅 ${fmtDate(e.demoDate)}</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn-sm g" onclick="updateEnquiryStatus('${e.id}','Converted')">✅ Attended</button>
+        <button class="btn-sm r" onclick="updateEnquiryStatus('${e.id}','Not Interested')">❌ No Show</button>
+      </div>
+    </div>`).join('')
+    :'<div class="empty-state"><div class="es-icon">📅</div><div class="es-title">No demos scheduled</div></div>';
+}
+
+function renderStudentList(){
+  const students=DB.all('students');
+  const fees=DB.all('fees');
+  document.getElementById('studentList').innerHTML=students.length?students.map(s=>{
+    const batch=getBatch(s.batchId);
+    const paid=fees.some(f=>f.studentId===s.id&&f.month===todayStr().slice(0,7));
+    return `<div class="card stu-card" data-name="${s.name.toLowerCase()}">
+      <div class="card-head"><div class="av" style="background:var(--pl);color:var(--p3)">${initials(s.name)}</div>
+        <div><div class="nm">${s.name}</div><div class="sub">${s.id} • ${s.cls} • ${batch?.name||'—'}</div></div>
+        <span class="bdg ${paid?'bdg-g':'bdg-r'} mla">${paid?'✅ Paid':'⚠️ Due'}</span>
+      </div>
+      <div class="divider"></div>
+      <div class="row"><span class="rk">Parent</span><span class="rv">${s.parent}</span></div>
+      <div class="row"><span class="rk">Contact</span><span class="rv">${s.phone}</span></div>
+      <div class="row"><span class="rk">Subjects</span><span class="rv">${s.subjects.join(', ')}</span></div>
+      <div class="row"><span class="rk">Fees Plan</span><span class="rv">${s.feesPlan} • ₹${s.feesAmount.toLocaleString()}</span></div>
+      <button class="btn-sm s" style="margin-top:8px" onclick="showStudentDetail('${s.id}')">👤 View Profile</button>
+    </div>`;
+  }).join('')
+  :'<div class="empty-state"><div class="es-icon">👥</div><div class="es-title">No students yet</div></div>';
+}
+
+function renderFeeOverview(){
+  const fees=DB.all('fees');
+  const students=DB.all('students');
+  const total=fees.reduce((s,f)=>s+f.amount,0);
+  const paidIds=new Set(fees.filter(f=>f.month===todayStr().slice(0,7)).map(f=>f.studentId));
+  const unpaid=students.filter(s=>!paidIds.has(s.id));
+  const pendingAmt=unpaid.reduce((s,st)=>s+st.feesAmount,0);
+  document.getElementById('feeOverviewContent').innerHTML=`
+    <div class="sgrid">
+      <div class="sc" data-icon="💰"><div class="sl">Total Collected</div><div class="sv" style="color:var(--gc)">₹${(total/1000).toFixed(0)}K</div></div>
+      <div class="sc" data-icon="⚠️"><div class="sl">Pending</div><div class="sv" style="color:var(--r)">₹${(pendingAmt/1000).toFixed(0)}K</div><div class="ss">${unpaid.length} students</div></div>
+    </div>
+    <div class="sec-label">Fee Plans</div>
+    <div class="card">
+      <div class="row b"><span class="rk">Monthly — ₹3,500/mo</span><span class="rv">${students.filter(s=>s.feesPlan==='Monthly').length} students</span></div>
+      <div class="row b"><span class="rk">Quarterly — ₹10,000</span><span class="rv">${students.filter(s=>s.feesPlan==='Quarterly').length} students</span></div>
+      <div class="row b"><span class="rk">Half-Yearly — ₹19,000</span><span class="rv">${students.filter(s=>s.feesPlan==='Half-Yearly').length} students</span></div>
+      <div class="row"><span class="rk">Annual — ₹36,000</span><span class="rv">${students.filter(s=>s.feesPlan==='Annual').length} students</span></div>
+    </div>
+  `;
+}
+
+function renderFeePending(){
+  const students=DB.all('students');
+  const fees=DB.all('fees');
+  const paidIds=new Set(fees.filter(f=>f.month===todayStr().slice(0,7)).map(f=>f.studentId));
+  const unpaid=students.filter(s=>!paidIds.has(s.id));
+  document.getElementById('feePendingContent').innerHTML=unpaid.length
+    ?`<div class="alert r" style="margin-bottom:10px"><div class="alert-icon">⚠️</div><div class="alert-body"><div class="alert-title">${unpaid.length} students have pending fees</div></div></div>`
+     +unpaid.map(s=>`<div class="card" style="border-left:3px solid var(--r)">
+      <div class="card-head"><div class="av" style="background:var(--rl);color:var(--r)">${initials(s.name)}</div>
+        <div><div class="nm">${s.name}</div><div class="sub">${s.cls} • ${getBatch(s.batchId)?.name||''}</div></div>
+        <span class="bdg bdg-r mla">₹${s.feesAmount.toLocaleString()}</span>
+      </div>
+      <div class="btn-row"><button class="btn-sm g" onclick="quickCollect('${s.id}','${s.feesAmount}')">💰 Collect Now</button><button class="btn-sm s" onclick="toast('📱 Reminder sent to ${s.parent}!')">📱 Remind</button></div>
+    </div>`).join('')
+    :'<div class="empty-state"><div class="es-icon">🎉</div><div class="es-title">All fees collected!</div></div>';
+}
+
+function renderFeeHistory(){
+  const fees=DB.all('fees').slice().reverse();
+  const students=DB.all('students');
+  document.getElementById('feeHistoryContent').innerHTML=fees.length
+    ?fees.map(f=>{const s=getStudent(f.studentId);return `<div class="card"><div class="row"><div><div class="nm">${s?.name||'Unknown'}</div><div class="sub">${f.month} • ${f.mode}</div></div><div class="result-mark" style="color:var(--gc);font-size:16px">₹${f.amount.toLocaleString()}</div></div><div style="font-size:11px;color:var(--t3);margin-top:4px;font-weight:700">${fmtTime(f.paidAt)}</div></div>`;}).join('')
+    :'<div class="empty-state"><div class="es-icon">💰</div><div class="es-title">No payments recorded</div></div>';
+}
+
+function renderBatchList(){
+  const batches=DB.all('batches');
+  const students=DB.all('students');
+  const colors=['c-p','c-b','c-g','c-o'];
+  document.getElementById('batchList').innerHTML=batches.length?batches.map((b,i)=>{
+    const cnt=students.filter(s=>s.batchId===b.id).length;
+    const pct=Math.round(cnt/b.capacity*100);
+    return `<div class="card">
+      <div class="card-head"><div class="av" style="background:var(--pl);color:var(--p3)">${b.name.slice(-1)}</div>
+        <div><div class="nm">${b.name} — ${b.cls}</div><div class="sub">${b.teacher} • ${b.timing}</div></div>
+        <span class="bdg bdg-g mla">Live</span>
+      </div>
+      <div class="divider"></div>
+      <div class="row"><span class="rk">Subject</span><span class="rv">${b.subject}</span></div>
+      <div class="row"><span class="rk">Days</span><span class="rv">${(b.days||[]).join(', ')}</span></div>
+      <div class="prog-wrap" style="margin-top:8px;margin-bottom:0"><div class="prog-label"><span>Students</span><span style="color:${pct>=100?'var(--r)':'var(--gc)'}">${cnt}/${b.capacity}</span></div><div class="prog-bar"><div class="prog-fill ${pct>=100?'r':pct>80?'o':'g'}" style="width:${Math.min(pct,100)}%"></div></div></div>
+    </div>`;
+  }).join('')
+  :'<div class="empty-state"><div class="es-icon">🏫</div><div class="es-title">No batches yet</div></div>';
+}
+
+function renderNoticeList(){
+  const notices=DB.all('notices').slice().reverse();
+  document.getElementById('noticeList').innerHTML=notices.length?notices.map(n=>`
+    <div class="notice-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="nt">${n.title}</div>
+        <span class="bdg bdg-p">${n.target==='all'?'All':'Students'}</span>
+      </div>
+      <div class="nb">${n.body}</div>
+      <div class="nm">${fmtTime(n.sentAt)}</div>
+    </div>`).join('')
+  :'<div class="empty-state"><div class="es-icon">📢</div><div class="es-title">No notices sent</div></div>';
+}
+
+function renderHomeworkList(){
+  const hw=DB.all('homework').slice().reverse();
+  const batches=DB.all('batches');
+  document.getElementById('homeworkList').innerHTML=hw.length?hw.map(h=>{const b=getBatch(h.batchId);return`<div class="hw-card"><div class="hw-icon">📝</div><div style="flex:1"><div class="hs">${h.title}</div><div class="hd">${h.subject} • ${b?.name||''} • Due: ${fmtDate(h.dueDate)}</div><div class="hd" style="margin-top:4px">${h.desc}</div></div><span class="bdg bdg-g">Assigned</span></div>`;}).join('')
+  :'<div class="empty-state"><div class="es-icon">📚</div><div class="es-title">No homework assigned yet</div></div>';
+}
+
+function renderMaterialList(){
+  document.getElementById('materialList').innerHTML=`
+    <div class="card"><div class="row b"><span class="rk">📄 Sample Notes — Chapter 1</span><span class="rv" style="color:var(--p);cursor:pointer" onclick="toast('📄 Download in v2.0!')">View</span></div><div class="row"><span class="rk">📄 Practice Paper Set</span><span class="rv" style="color:var(--p);cursor:pointer" onclick="toast('📄 Download in v2.0!')">View</span></div></div>
+  `;
+}
+
+function renderTestList(){
+  const tests=DB.all('tests').slice().reverse();
+  const marks=DB.all('marks');
+  const batches=DB.all('batches');
+  document.getElementById('testList').innerHTML=tests.length?tests.map(t=>{
+    const b=getBatch(t.batchId);
+    const tm=marks.filter(m=>m.testId===t.id);
+    const avg=tm.length?Math.round(tm.reduce((s,m)=>s+m.percentage,0)/tm.length):null;
+    return `<div class="card">
+      <div class="card-head"><div><div class="nm">${t.name}</div><div class="sub">${t.subject} • ${b?.name||''} • ${fmtDate(t.date)}</div></div><span class="bdg ${tm.length?'bdg-g':'bdg-o'} mla">${tm.length?'Marks Entered':'Pending'}</span></div>
+      ${avg!==null?`<div class="divider"></div><div class="row"><span class="rk">Class Average</span><span class="rv" style="color:var(--gc)">${avg}%</span></div><div class="row"><span class="rk">Responses</span><span class="rv">${tm.length} students</span></div>`:''}
+    </div>`;
+  }).join('')
+  :'<div class="empty-state"><div class="es-icon">📝</div><div class="es-title">No tests created yet</div></div>';
+}
+
+function renderAttReport(){
+  const atts=DB.all('attendance');
+  const students=DB.all('students');
+  if(!atts.length){document.getElementById('attReportContent').innerHTML='<div class="empty-state"><div class="es-icon">📊</div><div class="es-title">No attendance data yet</div></div>';return;}
+  let html='';
+  students.forEach(s=>{
+    const total=atts.filter(a=>a.batchId===s.batchId).length;
+    const present=atts.filter(a=>a.batchId===s.batchId&&a.records?.[s.id]==='p').length;
+    const pct=total?Math.round(present/total*100):0;
+    html+=`<div class="card"><div class="prog-wrap"><div class="prog-label"><span style="font-weight:800">${s.name}</span><span style="color:${pct>=75?'var(--gc)':'var(--r)'}">${pct}%</span></div><div class="prog-bar"><div class="prog-fill ${pct>=75?'g':'r'}" style="width:${pct}%"></div></div></div><div style="font-size:11px;color:var(--t3);font-weight:700">${present}/${total} classes</div></div>`;
+  });
+  document.getElementById('attReportContent').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════════════════
+
+function saveEnquiry(){
+  const name=v('enqName'), cls=v('enqClass'), phone=v('enqPhone');
+  if(!name||!cls||!phone){toast('⚠️ Fill required fields'); return;}
+  const subjects=[...document.querySelectorAll('.enq-sub:checked')].map(c=>c.value);
+  DB.push('enquiries',{id:uid(),name,cls,school:v('enqSchool'),phone,subjects,source:v('enqSource'),status:'New',demoDate:v('enqDemo'),notes:v('enqNotes'),createdAt:new Date().toISOString()});
+  addNotif('📋 New enquiry: '+name);
+  clearForm(['enqName','enqClass','enqSchool','enqPhone','enqNotes','enqDemo']);
+  toast('✅ Enquiry added!');
+  switchTab(document.querySelector('#p-admin-enquiry .pill'),'enq-all');
+  renderEnquiryList();
+}
+
+function scheduleDemo(id){
+  const d=prompt('Enter demo date (YYYY-MM-DD):',todayStr());
+  if(!d)return;
+  DB.update('enquiries',id,{status:'Demo Scheduled',demoDate:d});
+  toast('📅 Demo scheduled!');
+  renderEnquiryList(); renderDemoList();
+}
+
+function convertEnquiry(id){
+  DB.update('enquiries',id,{status:'Converted'});
+  toast('✅ Enquiry converted!');
+  renderEnquiryList();
+}
+
+function markNI(id){
+  DB.update('enquiries',id,{status:'Not Interested'});
+  toast('❌ Marked as Not Interested');
+  renderEnquiryList();
+}
+
+function updateEnquiryStatus(id,status){
+  DB.update('enquiries',id,{status});
+  toast('✅ Status updated!');
+  renderDemoList();
+}
+
+function admitStudent(){
+  const name=v('admName'),cls=v('admClass'),parent=v('admParent'),phone=v('admPhone'),batchId=v('admBatch');
+  if(!name||!cls||!parent||!phone||!batchId){toast('⚠️ Fill all required fields'); return;}
+  const subjects=[...document.querySelectorAll('.adm-sub:checked')].map(c=>c.value);
+  const [plan,amt]=v('admFeesPlan').split('|');
+  const id='S'+String(DB.all('students').length+1).padStart(3,'0');
+  DB.push('students',{id,name,cls,parent,phone,batchId,subjects,feesPlan:plan,feesAmount:parseInt(amt),joinDate:v('admDate')||todayStr(),status:'active'});
+  addNotif('🎓 New student admitted: '+name);
+  toast('🎓 Student admitted! ID: '+id);
+  clearForm(['admName','admClass','admParent','admPhone']);
+  switchTab(document.querySelector('#p-admin-students .pill'),'stu-list');
+  renderStudentList();
+}
+
+function quickAdmit(){
+  const name=v('qName'),cls=v('qClass'),phone=v('qPhone'),batchId=v('qBatch');
+  if(!name||!cls||!phone){toast('⚠️ Fill all required fields'); return;}
+  const id='S'+String(DB.all('students').length+1).padStart(3,'0');
+  DB.push('students',{id,name,cls,parent:'',phone,batchId,subjects:['Maths'],feesPlan:'Monthly',feesAmount:3500,joinDate:todayStr(),status:'active'});
+  toast('🎓 Student admitted! ID: '+id);
+  closeModal('admitModal');
+  populateStudentSelect('feeStudent');
+}
+
+function collectFee(){
+  const studentId=v('feeStudent'),amount=parseInt(v('feeAmount')),month=v('feeMonth');
+  if(!studentId||!amount||!month){toast('⚠️ Fill all fields'); return;}
+  DB.push('fees',{id:uid(),studentId,amount,month,mode:v('feeMode'),notes:v('feeNotes'),paidAt:new Date().toISOString()});
+  const s=getStudent(studentId);
+  addNotif('💰 Fee collected: '+s?.name+' ₹'+amount.toLocaleString());
+  toast('💰 Payment recorded!');
+  clearForm(['feeStudent','feeAmount','feeNotes']);
+  renderFeeOverview(); renderFeePending(); renderFeeHistory();
+}
+
+function quickCollect(sid,amt){
+  const month=todayStr().slice(0,7);
+  DB.push('fees',{id:uid(),studentId:sid,amount:parseInt(amt),month,mode:'Cash',notes:'Quick collect',paidAt:new Date().toISOString()});
+  const s=getStudent(sid);
+  toast('💰 ₹'+parseInt(amt).toLocaleString()+' collected from '+s?.name+'!');
+  renderFeePending(); renderFeeOverview();
+}
+
+function saveBatch(){
+  const name=v('batName'),cls=v('batClass');
+  if(!name||!cls){toast('⚠️ Fill required fields'); return;}
+  const days=[...document.querySelectorAll('.bat-day:checked')].map(c=>c.value);
+  DB.push('batches',{id:'b'+uid(),name,cls,subject:v('batSubject'),teacher:v('batTeacher'),timing:v('batTiming'),days,capacity:parseInt(v('batCapacity'))||40,color:'p'});
+  toast('🏫 Batch created!');
+  clearForm(['batName','batClass','batSubject','batTeacher','batTiming','batCapacity']);
+  switchTab(document.querySelector('#p-admin-batches .pill'),'bat-list');
+  renderBatchList();
+  populateBatchSelect('admBatch'); populateBatchSelect('hwBatch'); populateBatchSelect('testBatch');
+}
+
+function saveNotice(){
+  const title=v('nTitle'),body=v('nBody');
+  if(!title||!body){toast('⚠️ Enter title and message'); return;}
+  DB.push('notices',{id:uid(),title,body,target:v('nTarget'),sentAt:new Date().toISOString()});
+  addNotif('📢 Notice sent: '+title);
+  toast('📢 Notice sent!');
+  clearForm(['nTitle','nBody']);
+  closeModal('noticeModal');
+  if(currentPage==='notices') renderNoticeList();
+}
+
+function saveHomework(){
+  const title=v('hwTitle'),subject=v('hwSubject'),batchId=v('hwBatch');
+  if(!title||!subject||!batchId){toast('⚠️ Fill required fields'); return;}
+  DB.push('homework',{id:uid(),title,subject,batchId,dueDate:v('hwDue'),maxMarks:parseInt(v('hwMarks'))||10,desc:v('hwDesc'),createdAt:new Date().toISOString()});
+  toast('📚 Homework assigned!');
+  clearForm(['hwTitle','hwSubject','hwDue','hwMarks','hwDesc']);
+  switchTab(document.querySelector('#p-teacher-homework .pill'),'hw-list');
+  renderHomeworkList();
+}
+
+function createTest(){
+  const name=v('testName'),subject=v('testSubject'),batchId=v('testBatch'),date=v('testDate'),total=parseInt(v('testTotal'));
+  if(!name||!subject||!batchId||!date||!total){toast('⚠️ Fill all fields'); return;}
+  const test={id:uid(),name,subject,batchId,date,totalMarks:total,createdAt:new Date().toISOString()};
+  DB.push('tests',test);
+  toast('📝 Test created!');
+  clearForm(['testName','testSubject','testDate','testTotal']);
+  switchTab(document.querySelector('#p-teacher-tests .pill'),'test-list');
+  renderTestList();
+  loadMarksDropdown();
+}
+
+function loadAttList(){
+  const batchId=v('attBatch');
+  if(!batchId)return;
+  const students=DB.all('students').filter(s=>s.batchId===batchId);
+  const existing=DB.all('attendance').find(a=>a.date===todayStr()&&a.batchId===batchId);
+  document.getElementById('attList').innerHTML=students.length?students.map(s=>`
+    <div class="att-row" id="arow-${s.id}">
+      <div class="av av-sm" style="background:var(--pl);color:var(--p3)">${initials(s.name)}</div>
+      <div style="margin-left:8px;flex:1"><div class="nm nm-sm">${s.name}</div><div class="sub">${s.id}</div></div>
+      <div class="att-btns">
+        <button class="att-btn ${existing?.records?.[s.id]==='p'?'ap':''}" onclick="setAtt('${s.id}',this,'p')">P</button>
+        <button class="att-btn ${existing?.records?.[s.id]==='a'?'aa':''}" onclick="setAtt('${s.id}',this,'a')">A</button>
+        <button class="att-btn ${existing?.records?.[s.id]==='l'?'al':''}" onclick="setAtt('${s.id}',this,'l')">L</button>
+      </div>
+    </div>`).join('')
+  :'<div class="empty-state"><div class="es-icon">👥</div><div class="es-title">No students in this batch</div></div>';
+}
+
+const attState={};
+function setAtt(sid,btn,status){
+  attState[sid]=status;
+  btn.closest('.att-btns').querySelectorAll('.att-btn').forEach(b=>b.classList.remove('ap','aa','al'));
+  btn.classList.add(status==='p'?'ap':status==='a'?'aa':'al');
+}
+function markAllAtt(s){
+  const batchId=v('attBatch');if(!batchId)return;
+  DB.all('students').filter(st=>st.batchId===batchId).forEach(st=>{attState[st.id]=s;});
+  loadAttList();
+  // Update UI
+  document.querySelectorAll('.att-row').forEach(row=>{
+    const sid=row.id.replace('arow-','');
+    row.querySelectorAll('.att-btn').forEach(b=>b.classList.remove('ap','aa','al'));
+    const btn=row.querySelectorAll('.att-btn')[s==='p'?0:1];
+    if(btn)btn.classList.add(s==='p'?'ap':'aa');
+    attState[sid]=s;
+  });
+}
+function clearAtt(){Object.keys(attState).forEach(k=>delete attState[k]);loadAttList();}
+function submitAttendance(){
+  const batchId=v('attBatch');if(!batchId){toast('⚠️ Select a batch');return;}
+  if(!Object.keys(attState).length){toast('⚠️ Mark attendance first');return;}
+  const existing=DB.all('attendance').find(a=>a.date===todayStr()&&a.batchId===batchId);
+  if(existing){ DB.update('attendance',existing.id,{records:{...existing.records,...attState}}); }
+  else { DB.push('attendance',{id:uid(),date:todayStr(),batchId,records:{...attState},submittedBy:currentUser.name}); }
+  const absent=Object.entries(attState).filter(([,v])=>v==='a').length;
+  toast(`✅ Attendance submitted! ${absent} absent — parents notified.`);
+}
+
+function loadMarksDropdown(){
+  const sel=document.getElementById('marksTestSelect');
+  const tests=DB.all('tests');
+  sel.innerHTML='<option value="">Select a test</option>'+tests.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+}
+
+function loadMarksEntry(){
+  const testId=v('marksTestSelect');if(!testId){document.getElementById('marksEntryArea').innerHTML='';return;}
+  const test=DB.all('tests').find(t=>t.id===testId);
+  const students=DB.all('students').filter(s=>s.batchId===test?.batchId);
+  const existing=DB.all('marks');
+  document.getElementById('marksEntryArea').innerHTML=students.length?`
+    <div class="card" id="marksForm">
+      ${students.map(s=>{const em=existing.find(m=>m.testId===testId&&m.studentId===s.id);return`
+        <div class="att-row">
+          <div><div class="nm nm-sm">${s.name}</div><div class="sub">${s.id}</div></div>
+          <input class="finp" type="number" id="mk-${s.id}" value="${em?.marks||''}" placeholder="/${test.totalMarks}" style="width:80px;text-align:center;margin:0">
+        </div>`}).join('')}
+    </div>
+    <button class="btn" onclick="saveMarks('${testId}','${test.totalMarks}')">💾 Save Marks</button>
+  `:'<div class="empty-state"><div class="es-icon">👥</div><div class="es-title">No students in this batch</div></div>';
+}
+
+function saveMarks(testId,total){
+  const test=DB.all('tests').find(t=>t.id===testId);
+  const students=DB.all('students').filter(s=>s.batchId===test?.batchId);
+  let saved=0;
+  students.forEach(s=>{
+    const marks=parseInt(document.getElementById('mk-'+s.id)?.value);
+    if(isNaN(marks))return;
+    const pct=Math.round(marks/total*100);
+    const existing=DB.all('marks').find(m=>m.testId===testId&&m.studentId===s.id);
+    if(existing){DB.update('marks',existing.id,{marks,percentage:pct});}
+    else{DB.push('marks',{id:uid(),testId,studentId:s.id,marks,percentage:pct});}
+    saved++;
+  });
+  toast(`💾 ${saved} marks saved! Parents notified.`);
+}
+
+function submitFeedback(){
+  const sid=currentUser.studentId||'S001';
+  const teach=parseInt(document.getElementById('sr-teach').dataset.val||0);
+  const doubt=parseInt(document.getElementById('sr-doubt').dataset.val||0);
+  const material=parseInt(document.getElementById('sr-material').dataset.val||0);
+  const overall=parseInt(document.getElementById('sr-overall').dataset.val||0);
+  if(!teach||!doubt||!material||!overall){toast('⚠️ Rate all categories');return;}
+  DB.push('feedback',{id:uid(),studentId:sid,teach,doubt,material,overall,suggestion:v('fbSuggestion')||'',submittedAt:new Date().toISOString()});
+  toast('⭐ Thank you for your feedback!');
+  ['sr-teach','sr-doubt','sr-material','sr-overall'].forEach(id=>{document.getElementById(id).dataset.val=0;buildStars(id.replace('sr-',''));});
+  document.getElementById('fbSuggestion').value='';
+}
+
+function showStudentDetail(id){
+  const s=getStudent(id);if(!s)return;
+  const batch=getBatch(s.batchId);
+  const fees=DB.all('fees').filter(f=>f.studentId===id);
+  const marks=DB.all('marks').filter(m=>m.studentId===id);
+  const att=getStudentAttendance(id);
+  document.getElementById('sdmTitle').textContent=s.name;
+  document.getElementById('sdmBody').innerHTML=`
+    <div class="profile-banner" style="margin-bottom:14px"><div class="pav">${initials(s.name)}</div><div><div class="pname">${s.name}</div><div class="psub">${s.cls} Std • ${batch?.name||'—'}</div><div class="pid">ID: ${s.id}</div></div></div>
+    <div class="card">
+      <div class="row b"><span class="rk">Parent</span><span class="rv">${s.parent}</span></div>
+      <div class="row b"><span class="rk">Contact</span><span class="rv">${s.phone}</span></div>
+      <div class="row b"><span class="rk">Subjects</span><span class="rv">${s.subjects.join(', ')}</span></div>
+      <div class="row b"><span class="rk">Fees Plan</span><span class="rv">${s.feesPlan} (₹${s.feesAmount.toLocaleString()})</span></div>
+      <div class="row b"><span class="rk">Attendance</span><span class="rv" style="color:var(--gc)">${att.pct}%</span></div>
+      <div class="row"><span class="rk">Join Date</span><span class="rv">${fmtDate(s.joinDate)}</span></div>
+    </div>
+    <div class="sec-label">Payments (${fees.length})</div>
+    <div class="card">${fees.length?fees.slice().reverse().map(f=>`<div class="row b"><span class="rk">${f.month} • ${f.mode}</span><span class="bdg bdg-g">₹${f.amount.toLocaleString()}</span></div>`).join(''):'<div style="font-size:12px;color:var(--t3);padding:4px;font-weight:700">No payments recorded</div>'}</div>
+    <div class="sec-label">Test Results (${marks.length})</div>
+    <div class="card">${marks.length?marks.map(m=>{const t=DB.all('tests').find(x=>x.id===m.testId);return`<div class="row b"><span class="rk">${t?.name||m.testId}</span><span class="rv">${m.marks}/${t?.totalMarks} (${m.percentage}%)</span></div>`;}).join(''):'<div style="font-size:12px;color:var(--t3);padding:4px;font-weight:700">No marks entered</div>'}</div>
+    <button class="btn btn-r" onclick="deleteStudent('${id}')">🗑️ Delete Student</button>
+  `;
+  openModal('studentDetailModal');
+}
+
+function deleteStudent(id){
+  if(!confirm('Delete this student? This cannot be undone.'))return;
+  DB.delete('students',id);
+  closeModal('studentDetailModal');
+  toast('🗑️ Student deleted');
+  renderStudentList();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════
+
+function switchTab(pill,showId){
+  const parent=pill.closest('.tab-pills');
+  parent.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  // Find all sibling divs (content panels) by collecting all ids referenced in pills
+  const ids=[];
+  parent.querySelectorAll('.pill').forEach(p=>{
+    const m=p.getAttribute('onclick').match(/'([^']+)'\)/);
+    if(m)ids.push(m[1]);
+  });
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const el=document.getElementById(showId);if(el)el.style.display='block';
+}
+
+function searchCards(q,containerId,selector){
+  document.querySelectorAll('#'+containerId+' '+selector).forEach(c=>{
+    const text=(c.dataset.name||c.textContent).toLowerCase();
+    c.style.display=!q||text.includes(q.toLowerCase())?'block':'none';
+  });
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function openNoticeModal(){openModal('noticeModal');}
+function openAdmitModal(){
+  populateBatchSelect('qBatch');
+  openModal('admitModal');
+}
+
+function populateBatchSelect(selId){
+  const sel=document.getElementById(selId);if(!sel)return;
+  const batches=DB.all('batches');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Select batch</option>'+batches.map(b=>`<option value="${b.id}">${b.name} — ${b.cls}</option>`).join('');
+  if(cur) sel.value=cur;
+}
+
+function populateStudentSelect(selId){
+  const sel=document.getElementById(selId);if(!sel)return;
+  const students=DB.all('students');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Select student</option>'+students.map(s=>`<option value="${s.id}">${s.name} (${s.id})</option>`).join('');
+  if(cur) sel.value=cur;
+}
+
+function buildStars(category){
+  const container=document.getElementById('sr-'+category);
+  if(!container)return;
+  const current=parseInt(container.dataset.val)||0;
+  container.innerHTML=[1,2,3,4,5].map(i=>`<span class="star ${i<=current?'lit':'dim'}" onclick="setStars('${category}',${i})">${i<=current?'⭐':'☆'}</span>`).join('');
+}
+
+function setStars(category,val){
+  const container=document.getElementById('sr-'+category);
+  if(!container)return;
+  container.dataset.val=val;
+  buildStars(category);
+}
+
+function addNotif(msg,icon='🔔'){
+  DB.push('notifications',{id:uid(),msg,icon,time:new Date().toISOString(),read:false});
+  updateNotifBadge();
+}
+
+function updateNotifBadge(){
+  const unread=DB.all('notifications').filter(n=>!n.read).length;
+  const dot=document.getElementById('notifDot');
+  if(dot) dot.style.display=unread?'block':'none';
+}
+
+// Notifications modal content
+document.addEventListener('click',function(e){
+  if(e.target.closest('#notifModal .modal-box')){
+    const notifs=DB.all('notifications');
+    notifs.forEach(n=>n.read=true);
+    DB.set('notifications',notifs);
+    updateNotifBadge();
+    document.getElementById('notifContent').innerHTML=notifs.length?notifs.slice().reverse().map(n=>`<div class="notice-card"><div class="nt">${n.icon} ${n.msg}</div><div class="nm">${fmtTime(n.time)}</div></div>`).join(''):'<div class="empty-state"><div class="es-icon">🔔</div><div class="es-title">No notifications</div></div>';
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+
+function v(id){const e=document.getElementById(id);return e?e.value.trim():''}
+function clearForm(ids){ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';})}
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function initials(name){return (name||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()||'??'}
+function getStudent(id){return DB.all('students').find(s=>s.id===id)}
+function getBatch(id){return DB.all('batches').find(b=>b.id===id)}
+function fmtDate(d){if(!d)return '—';try{return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}catch{return d}}
+function fmtTime(d){if(!d)return '—';try{const dt=new Date(d);const now=new Date();const diff=now-dt;if(diff<60000)return 'Just now';if(diff<3600000)return Math.round(diff/60000)+'m ago';if(diff<86400000)return Math.round(diff/3600000)+'h ago';return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}catch{return d}}
+function grade(pct){if(pct>=90)return 'A+';if(pct>=80)return 'A';if(pct>=70)return 'B+';if(pct>=60)return 'B';if(pct>=50)return 'C';return 'D'}
+
+function getStudentAttendance(sid){
+  const student=getStudent(sid);
+  const atts=DB.all('attendance').filter(a=>a.batchId===student?.batchId);
+  const total=atts.length;
+  const p=atts.filter(a=>a.records?.[sid]==='p').length;
+  const pct=total?Math.round(p/total*100):100;
+  return{total,p,pct};
+}
+
+let _toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+function updateClock(){
+  const el=document.getElementById('clockDisplay');
+  if(el){const now=new Date();el.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+  setTimeout(updateClock,30000);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════
+seedData();
+updateClock();
+
+// Check session
+const savedSession=DB.get('session');
+if(savedSession){
+  currentUser=savedSession;
+  launchApp();
+}
+
+// Init date on admission form
+if(document.getElementById('admDate')) document.getElementById('admDate').value=todayStr();
+</script>
