@@ -4,6 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Swati Tutorials</title>
+<meta name="description" content="Complete Tuition Management System"/>
+<meta name="theme-color" content="#7C3AED"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Swati Tutorials"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Poppins:wght@500;600;700;800&display=swap');
 :root{
@@ -2619,4 +2625,80 @@ async function bootApp(){
     setTimeout(waitForFirebase, 50);
   }
 })();
+
+// ═══════════════════════════════════════════════════════════
+//  PWA: Manifest + Service Worker + Install Prompt
+// ═══════════════════════════════════════════════════════════
+
+// Inject manifest dynamically (works without a separate file)
+(function(){
+  const m = {
+    name:"Swati Tutorials",short_name:"Swati",
+    description:"Complete Tuition Management System",
+    start_url:"./",display:"standalone",orientation:"portrait",
+    background_color:"#7C3AED",theme_color:"#7C3AED",
+    icons:[
+      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%237C3AED'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"},
+      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%237C3AED'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}
+    ]
+  };
+  const blob = new Blob([JSON.stringify(m)],{type:'application/json'});
+  const link = document.createElement('link');
+  link.rel='manifest'; link.href=URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  const sw = `
+    const CACHE='swati-v1';
+    self.addEventListener('install',e=>{
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate',e=>{
+      e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch',e=>{
+      e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
+    });
+  `;
+  const swBlob = new Blob([sw],{type:'text/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+    .then(()=>console.log('SW ready'))
+    .catch(()=>{});
+}
+
+// Install prompt banner
+let _dip = null;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); _dip = e;
+  setTimeout(()=>{
+    if(!_dip) return;
+    if(window.matchMedia('(display-mode: standalone)').matches) return;
+    const d = document.createElement('div');
+    d.id='ipb';
+    d.innerHTML=`<style>#ipb{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:#fff;border-radius:16px;padding:13px 16px;box-shadow:0 8px 32px rgba(124,58,237,0.25);display:flex;align-items:center;gap:10px;z-index:9999;max-width:360px;width:92%;border:1.5px solid #EDE9FE;animation:ibs .4s cubic-bezier(.34,1.56,.64,1)}@keyframes ibs{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}</style>
+    <span style="font-size:26px">&#127891;</span>
+    <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#1E1B4B">Install Swati Tutorials</div><div style="font-size:11px;color:#9CA3AF;margin-top:2px">Add to Home Screen for quick access</div></div>
+    <button onclick="doInstall()" style="background:#7C3AED;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif">Install</button>
+    <button onclick="document.getElementById('ipb').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;padding:0 2px">&times;</button>`;
+    document.body.appendChild(d);
+  }, 4000);
+});
+
+async function doInstall(){
+  if(!_dip) return;
+  _dip.prompt();
+  const {outcome} = await _dip.userChoice;
+  if(outcome==='accepted') toast('App installed! Find it on your Home Screen');
+  _dip=null;
+  const b=document.getElementById('ipb'); if(b) b.remove();
+}
+
+window.addEventListener('appinstalled',()=>{
+  toast('Swati Tutorials installed successfully!');
+  const b=document.getElementById('ipb'); if(b) b.remove();
+});
 </script>
