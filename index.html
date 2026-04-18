@@ -2164,6 +2164,298 @@ async function changePIN(){
 }
 
 // ═══════════════════════════════════════════════════════════
+//  SECURITY: HTML ESCAPE — prevents XSS in all innerHTML
+// ═══════════════════════════════════════════════════════════
+// Call x() on ANY user-supplied string before putting into innerHTML
+function x(str){
+  return String(str||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;')
+    .replace(/`/g,'&#96;');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SECURITY PATCHES: FIX ALL innerHTML with user data
+// ═══════════════════════════════════════════════════════════
+
+// Patch renderEnquiryList to use x()
+const _origRenderEnquiryList = renderEnquiryList;
+window.renderEnquiryList = function(){
+  const enqs=DB.all('enquiries');
+  const statusColor={New:'bdg-o','Demo Scheduled':'bdg-b',Converted:'bdg-g','Not Interested':'bdg-r'};
+  document.getElementById('enquiryList').innerHTML=enqs.length?enqs.slice().reverse().map(e=>`
+    <div class="card enq-card" data-name="${x(e.name.toLowerCase())}">
+      <div class="card-head">
+        <div class="av" style="background:var(--pl);color:var(--p3)">${x(initials(e.name))}</div>
+        <div><div class="nm">${x(e.name)}</div><div class="sub">${x(e.cls)} Std • 📞 ${x(e.phone)}</div></div>
+        <span class="bdg ${statusColor[e.status]||'bdg-p'} mla">${x(e.status)}</span>
+      </div>
+      <div class="divider"></div>
+      <div class="row"><span class="rk">School</span><span class="rv">${x(e.school||'—')}</span></div>
+      <div class="row"><span class="rk">Subjects</span><span class="rv">${x((e.subjects||[]).join(', ')||'—')}</span></div>
+      <div class="row"><span class="rk">Source</span><span class="rv">${x(e.source)}</span></div>
+      ${e.demoDate?`<div class="row"><span class="rk">Demo Date</span><span class="rv">📅 ${x(fmtDate(e.demoDate))}</span></div>`:''}
+      <div class="btn-row">
+        ${e.status==='New'?`<button class="btn-sm" onclick="scheduleDemo('${x(e.id)}')">📅 Schedule Demo</button>`:''}
+        ${e.status!=='Converted'&&e.status!=='Not Interested'?`<button class="btn-sm g" onclick="convertEnquiry('${x(e.id)}')">✅ Convert</button>`:''}
+        ${e.status!=='Not Interested'&&e.status!=='Converted'?`<button class="btn-sm r" onclick="markNI('${x(e.id)}')">❌ Not Interested</button>`:''}
+      </div>
+    </div>`).join('')
+  :'<div class="empty-state"><div class="es-icon">📋</div><div class="es-title">No enquiries yet</div><div class="es-sub">Add your first enquiry!</div></div>';
+};
+
+// Patch renderStudentList to use x()
+const _origRenderStudentList = renderStudentList;
+window.renderStudentList = function(){
+  const students=DB.all('students');
+  const fees=DB.all('fees');
+  document.getElementById('studentList').innerHTML=students.length?students.map(s=>{
+    const batch=getBatch(s.batchId);
+    const paid=fees.some(f=>f.studentId===s.id&&f.month===todayStr().slice(0,7));
+    return `<div class="card stu-card" data-name="${x(s.name.toLowerCase())}">
+      <div class="card-head">
+        <div class="av" style="background:var(--pl);color:var(--p3)">${x(initials(s.name))}</div>
+        <div><div class="nm">${x(s.name)}</div><div class="sub">${x(s.id)} • ${x(s.cls)} • ${x(batch?.name||'—')}</div></div>
+        <span class="bdg ${paid?'bdg-g':'bdg-r'} mla">${paid?'✅ Paid':'⚠️ Due'}</span>
+      </div>
+      <div class="divider"></div>
+      <div class="row"><span class="rk">Parent</span><span class="rv">${x(s.parent)}</span></div>
+      <div class="row"><span class="rk">Contact</span><span class="rv">${x(s.phone)}</span></div>
+      <div class="row"><span class="rk">Subjects</span><span class="rv">${x(s.subjects.join(', '))}</span></div>
+      <div class="row"><span class="rk">Fees Plan</span><span class="rv">${x(s.feesPlan)} • ₹${s.feesAmount.toLocaleString()}</span></div>
+      <button class="btn-sm s" style="margin-top:8px" onclick="showStudentDetail('${x(s.id)}')">👤 View Profile</button>
+    </div>`;
+  }).join('')
+  :'<div class="empty-state"><div class="es-icon">👥</div><div class="es-title">No students yet</div></div>';
+};
+
+// Patch renderNoticeList to use x()
+const _origRenderNoticeList = renderNoticeList;
+window.renderNoticeList = function(){
+  const notices=DB.all('notices').slice().reverse();
+  document.getElementById('noticeList').innerHTML=notices.length?notices.map(n=>`
+    <div class="notice-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="nt">${x(n.title)}</div>
+        <span class="bdg bdg-p">${n.target==='all'?'All':'Students'}</span>
+      </div>
+      <div class="nb">${x(n.body)}</div>
+      <div class="nm">${x(fmtTime(n.sentAt))}</div>
+    </div>`).join('')
+  :'<div class="empty-state"><div class="es-icon">📢</div><div class="es-title">No notices sent</div></div>';
+};
+
+// Patch renderHomeworkList to use x()
+const _origRenderHomeworkList = renderHomeworkList;
+window.renderHomeworkList = function(){
+  const hw=DB.all('homework').slice().reverse();
+  document.getElementById('homeworkList').innerHTML=hw.length?hw.map(h=>{
+    const b=getBatch(h.batchId);
+    return`<div class="hw-card">
+      <div class="hw-icon">📝</div>
+      <div style="flex:1">
+        <div class="hs">${x(h.title)}</div>
+        <div class="hd">${x(h.subject)} • ${x(b?.name||'')} • Due: ${x(fmtDate(h.dueDate))}</div>
+        <div class="hd" style="margin-top:4px">${x(h.desc)}</div>
+      </div>
+      <span class="bdg bdg-g">Assigned</span>
+    </div>`;}).join('')
+  :'<div class="empty-state"><div class="es-icon">📚</div><div class="es-title">No homework assigned yet</div></div>';
+};
+
+// ═══════════════════════════════════════════════════════════
+//  VALIDATION PATCHES
+// ═══════════════════════════════════════════════════════════
+
+// Patch collectFee — validate amount range
+const _origCollectFee = collectFee;
+window.collectFee = function(){
+  const studentId=v('feeStudent'), amount=parseInt(v('feeAmount')), month=v('feeMonth');
+  if(!studentId){ toast('⚠️ Select a student'); return; }
+  if(!amount || amount < 1 || amount > 200000){ toast('⚠️ Enter valid amount (₹1 – ₹2,00,000)'); return; }
+  if(!month){ toast('⚠️ Select a month'); return; }
+  DB.push('fees',{id:uid(),studentId,amount,month,mode:v('feeMode'),notes:SEC.clean(v('feeNotes')),paidAt:new Date().toISOString()});
+  const s=getStudent(studentId);
+  addNotif('💰 Fee collected: '+(s?.name||'')+ ' ₹'+amount.toLocaleString());
+  toast('💰 Payment recorded! ₹'+amount.toLocaleString()+' from '+(s?.name||''));
+  clearForm(['feeStudent','feeAmount','feeNotes']);
+  renderFeeOverview(); renderFeePending(); renderFeeHistory();
+};
+
+// Patch saveMarks — validate marks don't exceed total
+const _origSaveMarks = saveMarks;
+window.saveMarks = function(testId, total){
+  const test=DB.all('tests').find(t=>t.id===testId);
+  const students=DB.all('students').filter(s=>s.batchId===test?.batchId);
+  let saved=0, errors=0;
+  students.forEach(s=>{
+    const inp=document.getElementById('mk-'+s.id);
+    if(!inp||inp.value==='') return;
+    const marks=parseInt(inp.value);
+    if(isNaN(marks)||marks<0){ errors++; inp.style.borderColor='var(--r)'; return; }
+    if(marks>parseInt(total)){ errors++; inp.style.borderColor='var(--r)'; inp.title='Cannot exceed '+total; return; }
+    inp.style.borderColor='';
+    const pct=Math.round(marks/total*100);
+    const existing=DB.all('marks').find(m=>m.testId===testId&&m.studentId===s.id);
+    if(existing){ DB.update('marks',existing.id,{marks,percentage:pct}); }
+    else{ DB.push('marks',{id:uid(),testId,studentId:s.id,marks,percentage:pct}); }
+    saved++;
+  });
+  if(errors){ toast('⚠️ '+errors+' invalid marks (check red fields)'); return; }
+  toast('💾 '+saved+' marks saved! Results visible to students & parents.');
+};
+
+// Patch deleteStudent — cascade delete all related data
+const _origDeleteStudent = deleteStudent;
+window.deleteStudent = function(id){
+  const s=getStudent(id);
+  if(!confirm('Delete '+s?.name+'?\n\nThis will also delete their:\n• All fee records\n• All test marks\n• All attendance records\n\nThis CANNOT be undone!')) return;
+  // Cascade delete
+  DB.set('fees', DB.all('fees').filter(f=>f.studentId!==id));
+  DB.set('marks', DB.all('marks').filter(m=>m.studentId!==id));
+  // Remove from attendance records
+  const atts=DB.all('attendance').map(a=>{ const r={...a.records}; delete r[id]; return {...a,records:r}; });
+  DB.set('attendance', atts);
+  // Remove from users if registered
+  DB.set('users', DB.all('users').filter(u=>u.studentId!==id));
+  // Delete student
+  DB.delete('students',id);
+  closeModal('studentDetailModal');
+  toast('🗑️ Student and all related data deleted');
+  renderStudentList();
+};
+
+// ═══════════════════════════════════════════════════════════
+//  FEE RECEIPT GENERATOR (print-friendly)
+// ═══════════════════════════════════════════════════════════
+function generateReceipt(feeId){
+  const fees=DB.all('fees');
+  const fee=fees.find(f=>f.id===feeId);
+  if(!fee){ toast('❌ Receipt not found'); return; }
+  const s=getStudent(fee.studentId);
+  const batch=getBatch(s?.batchId);
+  const receiptNo='RCP-'+fee.id.slice(0,8).toUpperCase();
+
+  const win=window.open('','_blank','width=400,height=600');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Fee Receipt — ${x(s?.name||'')}</title>
+  <style>
+    body{font-family:Arial,sans-serif;padding:24px;max-width:360px;margin:0 auto;color:#1a1a2e}
+    .logo{text-align:center;margin-bottom:16px}
+    .logo h2{color:#7C3AED;margin:0;font-size:20px}
+    .logo p{color:#999;font-size:11px;margin:4px 0 0}
+    .receipt-no{text-align:center;font-size:11px;color:#7C3AED;font-weight:bold;margin-bottom:12px}
+    hr{border:none;border-top:2px dashed #ccc;margin:12px 0}
+    .row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #f0f0f0}
+    .row .k{color:#666}
+    .row .v{font-weight:bold;color:#1a1a2e}
+    .amount-box{background:#EDE9FE;border-radius:8px;padding:12px;text-align:center;margin:12px 0}
+    .amount-box .amt{font-size:28px;font-weight:900;color:#5B21B6}
+    .amount-box .albl{font-size:11px;color:#7C3AED}
+    .footer{text-align:center;font-size:11px;color:#999;margin-top:16px}
+    .paid{background:#D1FAE5;color:#065F46;padding:4px 12px;border-radius:20px;font-weight:bold;font-size:12px}
+    @media print{button{display:none}}
+  </style></head><body>
+  <div class="logo">
+    <h2>🎓 Swati Tutorials</h2>
+    <p>Pune, Maharashtra</p>
+  </div>
+  <div class="receipt-no">Receipt No: ${receiptNo}</div>
+  <hr>
+  <div class="row"><span class="k">Student</span><span class="v">${x(s?.name||'—')}</span></div>
+  <div class="row"><span class="k">Student ID</span><span class="v">${x(s?.id||'—')}</span></div>
+  <div class="row"><span class="k">Class</span><span class="v">${x(s?.cls||'—')} Std</span></div>
+  <div class="row"><span class="k">Batch</span><span class="v">${x(batch?.name||'—')}</span></div>
+  <div class="row"><span class="k">Parent</span><span class="v">${x(s?.parent||'—')}</span></div>
+  <hr>
+  <div class="amount-box">
+    <div class="albl">Amount Paid</div>
+    <div class="amt">₹${fee.amount.toLocaleString()}</div>
+    <span class="paid">✅ PAID</span>
+  </div>
+  <div class="row"><span class="k">Month</span><span class="v">${x(fee.month)}</span></div>
+  <div class="row"><span class="k">Mode</span><span class="v">${x(fee.mode)}</span></div>
+  <div class="row"><span class="k">Date</span><span class="v">${x(fmtDate(fee.paidAt))}</span></div>
+  ${fee.notes?`<div class="row"><span class="k">Notes</span><span class="v">${x(fee.notes)}</span></div>`:''}
+  <hr>
+  <div class="footer">
+    <p>Thank you! 🙏</p>
+    <p>This is a computer-generated receipt.</p>
+    <p>Swati Tutorials, Pune</p>
+  </div>
+  <br>
+  <button onclick="window.print()" style="width:100%;padding:10px;background:#7C3AED;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer">🖨️ Print Receipt</button>
+  </body></html>`);
+  win.document.close();
+}
+
+// Patch renderFeeHistory to show receipt button
+const _origRenderFeeHistory = renderFeeHistory;
+window.renderFeeHistory = function(){
+  const fees=DB.all('fees').slice().reverse();
+  document.getElementById('feeHistoryContent').innerHTML=fees.length
+    ?fees.map(f=>{const s=getStudent(f.studentId);return `
+      <div class="card">
+        <div class="row">
+          <div><div class="nm">${x(s?.name||'Unknown')}</div><div class="sub">${x(f.month)} • ${x(f.mode)}</div></div>
+          <div class="result-mark" style="color:var(--gc);font-size:16px">₹${f.amount.toLocaleString()}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <div style="font-size:11px;color:var(--t3);font-weight:700">${x(fmtTime(f.paidAt))}</div>
+          <button class="btn-sm s" onclick="generateReceipt('${x(f.id)}')">🧾 Receipt</button>
+        </div>
+      </div>`;}).join('')
+    :'<div class="empty-state"><div class="es-icon">💰</div><div class="es-title">No payments recorded</div></div>';
+};
+
+// Patch parentFees to show receipt buttons
+const _origParentFees = renderers.parent_fees;
+renderers.parent_fees = function(){
+  const sid=currentUser.studentId||'S001';
+  const s=getStudent(sid);
+  const fees=DB.all('fees').filter(f=>f.studentId===sid);
+  const thisMonth=fees.find(f=>f.month===todayStr().slice(0,7));
+  document.getElementById('parentFeeStatus').innerHTML=thisMonth
+    ?`<div class="fee-card-paid">
+        <div class="row"><span class="rk" style="color:#065F46;font-weight:800">This Month</span><span class="bdg bdg-g">✅ Paid</span></div>
+        <div class="row"><span class="rk">Amount</span><span class="rv" style="color:#065F46;font-size:20px">₹${thisMonth.amount.toLocaleString()}</span></div>
+        <div class="row"><span class="rk">Mode</span><span class="rv">${x(thisMonth.mode)}</span></div>
+        <div class="row"><span class="rk">Date</span><span class="rv">${x(fmtDate(thisMonth.paidAt))}</span></div>
+        <button class="btn-sm s" style="margin-top:8px" onclick="generateReceipt('${x(thisMonth.id)}')">🧾 Download Receipt</button>
+      </div>`
+    :`<div class="fee-card-due">
+        <div class="row"><span class="rk" style="color:#991B1B;font-weight:800">This Month</span><span class="bdg bdg-r">⚠️ Due</span></div>
+        <div class="row"><span class="rk">Amount Due</span><span class="rv" style="color:#991B1B;font-size:20px">₹${s?.feesAmount?.toLocaleString()||'3,500'}</span></div>
+      </div>`;
+  document.getElementById('parentFeeHistory').innerHTML=fees.slice().reverse().map(f=>`
+    <div class="row b">
+      <span class="rk">${x(f.month)} • ${x(f.mode)}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="bdg bdg-g">₹${f.amount.toLocaleString()}</span>
+        <button class="btn-sm s" style="padding:3px 8px;font-size:10px" onclick="generateReceipt('${x(f.id)}')">🧾</button>
+      </div>
+    </div>`).join('')||'<div style="font-size:13px;color:var(--t3);text-align:center;padding:8px;font-weight:700">No payment history</div>';
+};
+
+// ═══════════════════════════════════════════════════════════
+//  DATA INTEGRITY: prevent duplicate fee for same student+month
+// ═══════════════════════════════════════════════════════════
+const _origQuickCollect = quickCollect;
+window.quickCollect = function(sid, amt){
+  const month=todayStr().slice(0,7);
+  const already=DB.all('fees').find(f=>f.studentId===sid&&f.month===month);
+  if(already){ toast('⚠️ Fee already collected for this month!'); return; }
+  DB.push('fees',{id:uid(),studentId:sid,amount:parseInt(amt),month,mode:'Cash',notes:'Quick collect',paidAt:new Date().toISOString()});
+  const s=getStudent(sid);
+  addNotif('💰 Fee collected: '+(s?.name||'')+' ₹'+parseInt(amt).toLocaleString());
+  toast('💰 ₹'+parseInt(amt).toLocaleString()+' collected from '+(s?.name||'')+'!');
+  renderFeePending(); renderFeeOverview(); renderFeeHistory();
+};
+
+// ═══════════════════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════════════════
 seedData();
