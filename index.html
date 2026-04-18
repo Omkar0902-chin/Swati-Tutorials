@@ -49,11 +49,16 @@ body{font-family:'Nunito',sans-serif;background:#C4B5FD;display:flex;justify-con
 .role-opt .ri{font-size:22px;display:block;margin-bottom:4px}
 .role-opt .rl{font-size:11px;font-weight:800;color:var(--t2)}
 .role-opt.selected .rl{color:var(--p)}
-.otp-box{display:none}
-.otp-digits{display:flex;gap:8px;justify-content:center;margin:12px 0}
-.otp-digit{width:48px;height:52px;border:2px solid var(--border);border-radius:12px;text-align:center;font-size:20px;font-weight:800;color:var(--t1);font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s}
-.otp-digit:focus{border-color:var(--p)}
-.demo-hint{background:var(--pl);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--p3);font-weight:700;text-align:center;margin-bottom:12px}
+.pin-box{display:none}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin:16px 0}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--border);transition:all 0.2s}
+.pin-dot.filled{background:var(--p);transform:scale(1.15)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.pin-key{height:52px;border-radius:12px;border:1.5px solid var(--border);background:#fafafa;font-size:18px;font-weight:900;color:var(--t1);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.pin-key:active{background:var(--pl);border-color:var(--p);transform:scale(0.94)}
+.pin-key.del{font-size:16px;background:var(--rl);border-color:#FCA5A5;color:var(--r)}
+.pin-key.zero{grid-column:2}
+.pin-hint{background:var(--pl);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--p3);font-weight:700;text-align:center;margin-bottom:8px}
 
 /* ── Top Bar ── */
 .topbar{background:linear-gradient(135deg,var(--p),var(--p2));padding:12px 16px 14px;flex-shrink:0;position:relative;overflow:hidden}
@@ -335,8 +340,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     <p>Complete Tuition Management System</p>
   </div>
   <div class="login-box">
-    <h2>Welcome Back!</h2>
-    <p>Select your role to login</p>
+    <h2>Welcome Back! 👋</h2>
+    <p>Select your role to continue</p>
     <div class="role-select" id="roleSelect">
       <div class="role-opt selected" data-role="admin" onclick="selectRole(this)">
         <span class="ri">👑</span><div class="rl">Admin</div>
@@ -351,25 +356,38 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <span class="ri">👨‍👩‍👧</span><div class="rl">Parent</div>
       </div>
     </div>
+
+    <!-- Step 1: Mobile number -->
     <div id="phoneStep">
       <div class="fgroup">
-        <label class="flabel">Mobile Number</label>
-        <input class="finp" type="tel" id="loginPhone" placeholder="+91 98765 43210" maxlength="13">
+        <label class="flabel">Registered Mobile Number</label>
+        <input class="finp" type="tel" id="loginPhone" placeholder="Enter 10-digit mobile" maxlength="10" style="font-size:16px;letter-spacing:2px">
       </div>
-      <button class="btn" onclick="sendOTP()">📱 Send OTP</button>
+      <button class="btn" onclick="goToPIN()">🔐 Continue to PIN</button>
     </div>
-    <div class="otp-box" id="otpStep">
-      <div class="demo-hint">🔑 Demo OTP: <strong>1234</strong></div>
-      <div class="fgroup">
-        <label class="flabel">Enter OTP</label>
-        <div class="otp-digits">
-          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,1)" id="o1">
-          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,2)" id="o2">
-          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,3)" id="o3">
-          <input class="otp-digit" maxlength="1" type="number" oninput="otpNext(this,4)" id="o4">
-        </div>
+
+    <!-- Step 2: PIN pad -->
+    <div class="pin-box" id="pinStep">
+      <div class="pin-hint" id="pinHint">🔑 Enter your 4-digit PIN</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+        <div class="pin-dot" id="pd4"></div>
       </div>
-      <button class="btn" onclick="verifyOTP()">✅ Verify & Login</button>
+      <div class="pin-pad">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key zero" onclick="pinKey('0')">0</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
+      </div>
       <button class="btn-out" onclick="backToPhone()">← Change Number</button>
     </div>
   </div>
@@ -389,6 +407,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
       <div class="tb-right">
         <button class="icon-btn" onclick="openModal('notifModal')">🔔<div class="badge" id="notifDot"></div></button>
+        <button class="icon-btn" onclick="openChangePIN()" title="Change PIN">🔑</button>
         <button class="icon-btn" onclick="doLogout()">🚪</button>
       </div>
     </div>
@@ -823,6 +842,21 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   </div>
 </div>
 
+<!-- Change PIN Modal -->
+<div class="modal-overlay" id="changePINModal" onclick="closeModal('changePINModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><div class="modal-title">🔑 Change PIN</div><button class="modal-close" onclick="closeModal('changePINModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="alert p" style="margin-bottom:14px"><div class="alert-icon">ℹ️</div><div class="alert-body"><div class="alert-title">PIN must be 4 digits</div><div class="alert-sub">Choose something only you know — not your birth year!</div></div></div>
+      <div class="fgroup"><label class="flabel">Current PIN</label><input class="finp" type="password" id="cpCurrent" placeholder="Enter current PIN" maxlength="4" inputmode="numeric"></div>
+      <div class="fgroup"><label class="flabel">New PIN</label><input class="finp" type="password" id="cpNew" placeholder="Enter new 4-digit PIN" maxlength="4" inputmode="numeric"></div>
+      <div class="fgroup"><label class="flabel">Confirm New PIN</label><input class="finp" type="password" id="cpConfirm" placeholder="Re-enter new PIN" maxlength="4" inputmode="numeric"></div>
+      <button class="btn" onclick="changePIN()">🔑 Update PIN</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -937,10 +971,12 @@ function seedData(){
 
   // Users (login credentials)
   DB.set('users',[
-    {id:'U001',role:'admin',name:"Swati Ma'am",sub:'Owner & Admin',phone:'9999999999',pin:'1234'},
-    {id:'U002',role:'teacher',name:'Mr. R. Sharma',sub:'Mathematics Teacher',phone:'8888888888',pin:'1234'},
-    {id:'U003',role:'student',name:'Rahul Desai',sub:'9th Std • Batch A',phone:'9876543210',pin:'1234',studentId:'S001'},
-    {id:'U004',role:'parent',name:'Suresh Desai',sub:'Parent of Rahul Desai',phone:'9876543210',pin:'1234',studentId:'S001'},
+    // PINs stored as SHA-256 hashes. Default PIN: 1234 → hash below
+    // To change PIN: use SEC.hashPin('newpin') in console, update pinHash
+    {id:'U001',role:'admin',name:"Swati Ma'am",sub:'Owner & Admin',phone:'9999999999',pinHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'},
+    {id:'U002',role:'teacher',name:'Mr. R. Sharma',sub:'Mathematics Teacher',phone:'8888888888',pinHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'},
+    {id:'U003',role:'student',name:'Rahul Desai',sub:'9th Std • Batch A',phone:'9876543210',pinHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',studentId:'S001'},
+    {id:'U004',role:'parent',name:'Suresh Desai',sub:'Parent of Rahul Desai',phone:'9876543210',pinHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',studentId:'S001'},
   ]);
 
   DB.set('seeded',true);
@@ -949,8 +985,59 @@ function seedData(){
 // ═══════════════════════════════════════════════════════════
 //  AUTH STATE
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  SECURITY MODULE
+// ═══════════════════════════════════════════════════════════
+const SEC = {
+  // SHA-256 hash (async, Web Crypto API — built into every browser, no library needed)
+  async hash(str){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  },
+
+  // Brute-force: lock after 5 wrong PINs for 15 minutes
+  _fails:{}, _locks:{},
+  LIMIT:5, LOCK_MS:15*60*1000,
+  canTry(id){
+    if(this._locks[id] && Date.now()<this._locks[id]){
+      const m=Math.ceil((this._locks[id]-Date.now())/60000);
+      toast('🔒 Locked. Try again in '+m+' min'); return false;
+    }
+    return true;
+  },
+  fail(id){
+    this._fails[id]=(this._fails[id]||0)+1;
+    if(this._fails[id]>=this.LIMIT){
+      this._locks[id]=Date.now()+this.LOCK_MS;
+      this._fails[id]=0;
+      // Shake PIN dots
+      document.querySelectorAll('.pin-dot').forEach(d=>{d.style.background='var(--r)';});
+      setTimeout(()=>{ document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('filled'));
+        document.querySelectorAll('.pin-dot').forEach(d=>{d.style.background='';});
+      },600);
+      toast('🔒 Too many wrong PINs — locked 15 min');
+    } else {
+      const left=this.LIMIT-this._fails[id];
+      toast('❌ Wrong PIN — '+left+' attempt'+(left>1?'s':'')+' left');
+    }
+  },
+  ok(id){ delete this._fails[id]; delete this._locks[id]; },
+
+  // Session: 8-hour timeout
+  SESSION_MS: 8*60*60*1000,
+  mkSession(user){ return {user, exp: Date.now()+this.SESSION_MS}; },
+  validSession(s){ return s&&s.user&&Date.now()<s.exp; },
+
+  // XSS sanitiser
+  clean(s){ return String(s||'').replace(/[<>"'`]/g,''); },
+};
+
+// ─── Auth state ───
 let currentUser = null;
 let selectedLoginRole = 'admin';
+let _pinBuffer = '';
+let _pinPhone = '';
+let _sessionTimer = null;
 
 function selectRole(el){
   document.querySelectorAll('.role-opt').forEach(e=>e.classList.remove('selected'));
@@ -958,48 +1045,110 @@ function selectRole(el){
   selectedLoginRole = el.dataset.role;
 }
 
-function sendOTP(){
-  const ph = document.getElementById('loginPhone').value.trim();
-  if(!ph){toast('⚠️ Enter mobile number'); return;}
-  document.getElementById('phoneStep').style.display='none';
-  document.getElementById('otpStep').style.display='block';
-  document.getElementById('o1').focus();
-  toast('📱 OTP sent! (use 1234 for demo)');
-}
+// Step 1 — verify mobile, go to PIN pad
+function goToPIN(){
+  const ph = document.getElementById('loginPhone').value.trim().replace(/\D/g,'');
+  if(ph.length !== 10){ toast('⚠️ Enter valid 10-digit mobile number'); return; }
+  if(!SEC.canTry(ph)) return;
 
-function otpNext(el,idx){
-  if(el.value.length>=1 && idx<4) document.getElementById('o'+(idx+1)).focus();
-  if(idx===4) verifyOTP();
-}
-
-function backToPhone(){
-  document.getElementById('otpStep').style.display='none';
-  document.getElementById('phoneStep').style.display='block';
-  [1,2,3,4].forEach(i=>document.getElementById('o'+i).value='');
-}
-
-function verifyOTP(){
-  const otp = [1,2,3,4].map(i=>document.getElementById('o'+i).value).join('');
-  if(otp!=='1234'){toast('❌ Wrong OTP. Use 1234'); return;}
   const users = DB.all('users');
-  const user = users.find(u=>u.role===selectedLoginRole);
-  if(!user){toast('❌ No user found for this role'); return;}
-  currentUser = user;
-  DB.set('session',user);
+  const match = users.find(u => u.phone===ph && u.role===selectedLoginRole);
+  if(!match){
+    SEC.fail(ph);
+    toast('⚠️ Mobile not registered for this role');
+    return;
+  }
+
+  _pinPhone = ph;
+  _pinBuffer = '';
+  updatePinDots();
+  document.getElementById('pinHint').textContent = '🔑 Enter your 4-digit PIN';
+  document.getElementById('pinHint').style.background = 'var(--pl)';
+  document.getElementById('pinHint').style.color = 'var(--p3)';
+  document.getElementById('phoneStep').style.display = 'none';
+  document.getElementById('pinStep').style.display = 'block';
+}
+
+// PIN keypad input
+function pinKey(d){
+  if(_pinBuffer.length >= 4) return;
+  _pinBuffer += d;
+  updatePinDots();
+  if(_pinBuffer.length === 4) setTimeout(verifyPIN, 180);
+}
+
+function pinDel(){
+  _pinBuffer = _pinBuffer.slice(0,-1);
+  updatePinDots();
+}
+
+function updatePinDots(){
+  for(let i=1;i<=4;i++){
+    const dot = document.getElementById('pd'+i);
+    if(dot) dot.classList.toggle('filled', i<=_pinBuffer.length);
+  }
+}
+
+async function verifyPIN(){
+  if(!SEC.canTry(_pinPhone)){ _pinBuffer=''; updatePinDots(); return; }
+
+  const users = DB.all('users');
+  const user  = users.find(u => u.phone===_pinPhone && u.role===selectedLoginRole);
+  if(!user){ toast('❌ User not found'); return; }
+
+  // Hash entered PIN and compare to stored hash
+  const enteredHash = await SEC.hash(_pinBuffer);
+  _pinBuffer = ''; // clear immediately regardless of result
+
+  if(enteredHash !== user.pinHash){
+    updatePinDots();
+    SEC.fail(_pinPhone);
+    // Flash red dots
+    document.querySelectorAll('.pin-dot').forEach(d=>{ d.style.background='var(--r)'; d.classList.add('filled'); });
+    setTimeout(()=>{ updatePinDots(); document.querySelectorAll('.pin-dot').forEach(d=>d.style.background=''); }, 500);
+    return;
+  }
+
+  // ✅ PIN correct
+  SEC.ok(_pinPhone);
+
+  // Store only safe fields in session — no pinHash!
+  const safeUser = { id:user.id, role:user.role, name:user.name, sub:user.sub, phone:user.phone };
+  if(user.studentId) safeUser.studentId = user.studentId;
+
+  currentUser = safeUser;
+  DB.set('session', SEC.mkSession(safeUser));
+  startSessionTimer();
   launchApp();
 }
 
+function backToPhone(){
+  _pinBuffer = ''; _pinPhone = '';
+  updatePinDots();
+  document.getElementById('pinStep').style.display  = 'none';
+  document.getElementById('phoneStep').style.display = 'block';
+}
+
+function startSessionTimer(){
+  clearTimeout(_sessionTimer);
+  _sessionTimer = setTimeout(()=>{
+    toast('⏰ Session expired. Please login again.');
+    setTimeout(doLogout, 2000);
+  }, SEC.SESSION_MS);
+}
+
 function doLogout(){
-  currentUser = null;
-  DB.set('session',null);
+  clearTimeout(_sessionTimer);
+  currentUser = null; _pinBuffer = ''; _pinPhone = '';
+  DB.set('session', null);
   document.getElementById('loginView').classList.add('active');
   document.getElementById('mainView').classList.remove('active');
   backToPhone();
-  document.getElementById('loginPhone').value='';
-  selectedLoginRole='admin';
+  document.getElementById('loginPhone').value = '';
+  selectedLoginRole = 'admin';
   document.querySelectorAll('.role-opt').forEach(e=>e.classList.remove('selected'));
   document.querySelector('.role-opt[data-role="admin"]').classList.add('selected');
-  toast('👋 Logged out');
+  toast('👋 Logged out securely');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1061,7 +1210,7 @@ function buildRoleBar(){
   const bar = document.getElementById('roleBar');
   bar.innerHTML='';
   if(currentUser.role==='admin'){
-    // Admin can switch views (for demo/management)
+    // Admin can switch views for management oversight
     Object.entries(ROLE_CONFIG).forEach(([r,cfg])=>{
       const btn=document.createElement('button');
       btn.className='rtab'+(r===currentRole?' active':'');
@@ -1070,11 +1219,12 @@ function buildRoleBar(){
       bar.appendChild(btn);
     });
   } else {
-    // Non-admin sees only their own role
+    // Non-admin: locked to their own role only — cannot switch
     const cfg=ROLE_CONFIG[currentUser.role];
     const btn=document.createElement('button');
     btn.className='rtab active';
     btn.textContent=cfg.icon+' '+cfg.label;
+    // No onclick — role locked
     bar.appendChild(btn);
   }
 }
@@ -1100,6 +1250,11 @@ function buildBottomNav(){
 }
 
 function goPage(role,pageId){
+  // Security: non-admin cannot access other roles' pages
+  if(currentUser && currentUser.role !== 'admin' && role !== currentUser.role){
+    toast('🔒 Access denied');
+    return;
+  }
   currentRole=role; currentPage=pageId;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const p=document.getElementById('p-'+role+'-'+pageId);
@@ -1597,7 +1752,7 @@ function renderAttReport(){
 // ═══════════════════════════════════════════════════════════
 
 function saveEnquiry(){
-  const name=v('enqName'), cls=v('enqClass'), phone=v('enqPhone');
+  const name=SEC.clean(v('enqName')), cls=SEC.clean(v('enqClass')), phone=SEC.clean(v('enqPhone'));
   if(!name||!cls||!phone){toast('⚠️ Fill required fields'); return;}
   const subjects=[...document.querySelectorAll('.enq-sub:checked')].map(c=>c.value);
   DB.push('enquiries',{id:uid(),name,cls,school:v('enqSchool'),phone,subjects,source:v('enqSource'),status:'New',demoDate:v('enqDemo'),notes:v('enqNotes'),createdAt:new Date().toISOString()});
@@ -1635,7 +1790,7 @@ function updateEnquiryStatus(id,status){
 }
 
 function admitStudent(){
-  const name=v('admName'),cls=v('admClass'),parent=v('admParent'),phone=v('admPhone'),batchId=v('admBatch');
+  const name=SEC.clean(v('admName')),cls=SEC.clean(v('admClass')),parent=SEC.clean(v('admParent')),phone=SEC.clean(v('admPhone')),batchId=v('admBatch');
   if(!name||!cls||!parent||!phone||!batchId){toast('⚠️ Fill all required fields'); return;}
   const subjects=[...document.querySelectorAll('.adm-sub:checked')].map(c=>c.value);
   const [plan,amt]=v('admFeesPlan').split('|');
@@ -1690,7 +1845,7 @@ function saveBatch(){
 }
 
 function saveNotice(){
-  const title=v('nTitle'),body=v('nBody');
+  const title=SEC.clean(v('nTitle')),body=SEC.clean(v('nBody'));
   if(!title||!body){toast('⚠️ Enter title and message'); return;}
   DB.push('notices',{id:uid(),title,body,target:v('nTarget'),sentAt:new Date().toISOString()});
   addNotif('📢 Notice sent: '+title);
@@ -1980,17 +2135,48 @@ function updateClock(){
   setTimeout(updateClock,30000);
 }
 
+// ─── Change PIN ───
+function openChangePIN(){
+  clearForm(['cpCurrent','cpNew','cpConfirm']);
+  openModal('changePINModal');
+}
+
+async function changePIN(){
+  const curr = document.getElementById('cpCurrent').value.trim();
+  const nw   = document.getElementById('cpNew').value.trim();
+  const conf = document.getElementById('cpConfirm').value.trim();
+  if(!curr||!nw||!conf){ toast('⚠️ Fill all fields'); return; }
+  if(nw.length!==4||!/^\d{4}$/.test(nw)){ toast('⚠️ PIN must be exactly 4 digits'); return; }
+  if(nw!==conf){ toast('❌ New PINs do not match'); return; }
+
+  const users = DB.all('users');
+  const user  = users.find(u=>u.id===currentUser.id);
+  if(!user){ toast('❌ User not found'); return; }
+
+  const currHash = await SEC.hash(curr);
+  if(currHash !== user.pinHash){ toast('❌ Current PIN is wrong'); return; }
+
+  const newHash = await SEC.hash(nw);
+  DB.update('users', user.id, { pinHash: newHash });
+  toast('✅ PIN changed successfully!');
+  closeModal('changePINModal');
+  clearForm(['cpCurrent','cpNew','cpConfirm']);
+}
+
 // ═══════════════════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════════════════
 seedData();
 updateClock();
 
-// Check session
-const savedSession=DB.get('session');
-if(savedSession){
-  currentUser=savedSession;
+// ─── Secure session restore ───
+const savedSession = DB.get('session');
+if(SEC.validSession(savedSession)){
+  currentUser = savedSession.user;
+  startSessionTimer();
   launchApp();
+} else {
+  DB.set('session', null);
 }
 
 // Init date on admission form
