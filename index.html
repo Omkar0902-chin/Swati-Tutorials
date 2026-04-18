@@ -891,19 +891,114 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 'use strict';
 
 // ═══════════════════════════════════════════════════════════
-//  DATABASE — localStorage-backed JSON store
+//  DATABASE — Firestore (cloud) + localStorage (session only)
 // ═══════════════════════════════════════════════════════════
-const DB = {
-  _read(k){ try{return JSON.parse(localStorage.getItem('st_'+k)||'null')}catch{return null} },
-  _write(k,v){ localStorage.setItem('st_'+k, JSON.stringify(v)) },
-  get(k){ return this._read(k) },
-  set(k,v){ this._write(k,v); return v },
-  push(k,obj){ const a=this._read(k)||[]; a.push(obj); this._write(k,a); return obj },
-  update(k,id,patch){ const a=this._read(k)||[]; const i=a.findIndex(x=>x.id===id); if(i>=0){Object.assign(a[i],patch);this._write(k,a);return a[i]} return null },
-  delete(k,id){ const a=(this._read(k)||[]).filter(x=>x.id!==id); this._write(k,a) },
-  all(k){ return this._read(k)||[] }
+
+// Collections stored in Firestore (shared across all devices)
+const FIRESTORE_COLLECTIONS = new Set([
+  'students','batches','fees','attendance',
+  'homework','tests','marks','notices',
+  'enquiries','feedback','users'
+]);
+
+// In-memory cache so synchronous reads work after first load
+const _cache = {};
+
+// Firestore helpers
+async function _fsAll(col){
+  const {collection: col_, getDocs} = window.fsModules;
+  const snap = await getDocs(col_(window.firestore, col));
+  const docs = snap.docs.map(d => ({...d.data(), _docId: d.id}));
+  _cache[col] = docs;
+  return docs;
+}
+async function _fsPush(col, obj){
+  const {collection: col_, addDoc} = window.fsModules;
+  const ref = await addDoc(col_(window.firestore, col), obj);
+  obj._docId = ref.id;
+  return obj;
+}
+async function _fsUpdate(col, id, patch){
+  const {doc, updateDoc} = window.fsModules;
+  const items = _cache[col]||[];
+  const item = items.find(x=>x.id===id||x._docId===id);
+  if(!item) return null;
+  await updateDoc(doc(window.firestore, col, item._docId), patch);
+  Object.assign(item, patch);
+  return item;
+}
+async function _fsDelete(col, id){
+  const {doc, deleteDoc} = window.fsModules;
+  const items = _cache[col]||[];
+  const item = items.find(x=>x.id===id||x._docId===id);
+  if(!item) return;
+  await deleteDoc(doc(window.firestore, col, item._docId));
+  _cache[col] = items.filter(x=>x.id!==id&&x._docId!==item._docId);
+}
+
+// localStorage helpers (session/local prefs only)
+const _ls = {
+  read(k){ try{return JSON.parse(localStorage.getItem('st_'+k)||'null')}catch{return null} },
+  write(k,v){ localStorage.setItem('st_'+k, JSON.stringify(v)) }
 };
 
+const DB = {
+  get(k){ return _ls.read(k); },
+  set(k,v){
+    if(FIRESTORE_COLLECTIONS.has(k) && Array.isArray(v)){
+      _cache[k]=v;
+      return v;
+    }
+    _ls.write(k,v); return v;
+  },
+  all(k){
+    if(FIRESTORE_COLLECTIONS.has(k)) return _cache[k]||[];
+    return _ls.read(k)||[];
+  },
+  push(k, obj){
+    if(FIRESTORE_COLLECTIONS.has(k)){
+      if(!_cache[k]) _cache[k]=[];
+      if(!_cache[k].find(x=>x.id===obj.id)) _cache[k].push(obj);
+      _fsPush(k, obj).catch(e=>console.error('DB.push error',k,e));
+      return obj;
+    }
+    const a=_ls.read(k)||[]; a.push(obj); _ls.write(k,a); return obj;
+  },
+  update(k, id, patch){
+    if(FIRESTORE_COLLECTIONS.has(k)){
+      const a=_cache[k]||[];
+      const i=a.findIndex(x=>x.id===id);
+      if(i>=0) Object.assign(a[i], patch);
+      _fsUpdate(k, id, patch).catch(e=>console.error('DB.update error',k,e));
+      return a[i]||null;
+    }
+    const a=_ls.read(k)||[];
+    const i=a.findIndex(x=>x.id===id);
+    if(i>=0){Object.assign(a[i],patch);_ls.write(k,a);return a[i];}
+    return null;
+  },
+  delete(k, id){
+    if(FIRESTORE_COLLECTIONS.has(k)){
+      if(_cache[k]) _cache[k]=_cache[k].filter(x=>x.id!==id);
+      _fsDelete(k, id).catch(e=>console.error('DB.delete error',k,e));
+      return;
+    }
+    const a=(_ls.read(k)||[]).filter(x=>x.id!==id);
+    _ls.write(k,a);
+  }
+};
+
+// Load all Firestore collections into cache on boot
+async function loadAllFromFirestore(){
+  if(!window.firestore || !window.fsModules){ return; }
+  try {
+    await Promise.all([...FIRESTORE_COLLECTIONS].map(col => _fsAll(col)));
+    console.log('✅ Firestore data loaded');
+  } catch(e){
+    console.error('Firestore load error:', e);
+    toast('⚠️ Cloud sync failed — check your connection');
+  }
+}
 // ─── ID generator ───
 let _idBase = Date.now();
 const uid = () => (++_idBase).toString(36).toUpperCase();
@@ -2340,13 +2435,18 @@ window.deleteStudent = function(id){
   const s=getStudent(id);
   if(!confirm('Delete '+s?.name+'?\n\nThis will also delete their:\n• All fee records\n• All test marks\n• All attendance records\n\nThis CANNOT be undone!')) return;
   // Cascade delete
-  DB.set('fees', DB.all('fees').filter(f=>f.studentId!==id));
-  DB.set('marks', DB.all('marks').filter(m=>m.studentId!==id));
+  // Cascade delete fees, marks for this student
+  DB.all('fees').filter(f=>f.studentId===id).forEach(f=>DB.delete('fees',f.id));
+  DB.all('marks').filter(m=>m.studentId===id).forEach(m=>DB.delete('marks',m.id));
   // Remove from attendance records
-  const atts=DB.all('attendance').map(a=>{ const r={...a.records}; delete r[id]; return {...a,records:r}; });
-  DB.set('attendance', atts);
+  DB.all('attendance').forEach(a=>{
+    if(a.records&&a.records[id]!==undefined){
+      const r={...a.records}; delete r[id];
+      DB.update('attendance',a.id,{records:r});
+    }
+  });
   // Remove from users if registered
-  DB.set('users', DB.all('users').filter(u=>u.studentId!==id));
+  DB.all('users').filter(u=>u.studentId===id).forEach(u=>DB.delete('users',u.id));
   // Delete student
   DB.delete('students',id);
   closeModal('studentDetailModal');
@@ -2481,22 +2581,42 @@ window.quickCollect = function(sid, amt){
   renderFeePending(); renderFeeOverview(); renderFeeHistory();
 };
 
-// ═══════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════════════════
-seedData();
 updateClock();
 
-// ─── Secure session restore ───
-const savedSession = DB.get('session');
-if(SEC.validSession(savedSession)){
-  currentUser = savedSession.user;
-  startSessionTimer();
-  launchApp();
-} else {
-  DB.set('session', null);
+// Wait for Firebase then boot
+async function bootApp(){
+  // Load all data from Firestore into cache
+  await loadAllFromFirestore();
+
+  // Seed demo data only if Firestore is empty
+  const students = DB.all('students');
+  if(!students.length){
+    seedData();
+  }
+
+  // Restore session from localStorage
+  const savedSession = DB.get('session');
+  if(SEC.validSession(savedSession)){
+    currentUser = savedSession.user;
+    startSessionTimer();
+    launchApp();
+  } else {
+    DB.set('session', null);
+  }
+
+  // Init date on admission form
+  if(document.getElementById('admDate')) document.getElementById('admDate').value=todayStr();
 }
 
-// Init date on admission form
-if(document.getElementById('admDate')) document.getElementById('admDate').value=todayStr();
+// Wait for Firebase module to initialise, then boot
+(function waitForFirebase(){
+  if(window.firestore && window.fsModules){
+    bootApp();
+  } else {
+    setTimeout(waitForFirebase, 50);
+  }
+})();
 </script>
