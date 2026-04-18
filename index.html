@@ -319,6 +319,32 @@ textarea.finp{resize:none;min-height:80px}
 input[type=number]{-moz-appearance:textfield}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
 </style>
+
+<!-- ── Firebase SDK ── -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBNe3QrqdO3oNYEYneS-drkYPC2V01DsX8",
+    authDomain: "rsbacademy-manager.firebaseapp.com",
+    projectId: "rsbacademy-manager",
+    storageBucket: "rsbacademy-manager.firebasestorage.app",
+    messagingSenderId: "904399049513",
+    appId: "1:904399049513:web:b5ba9db3803b9c09fddd38"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Make Firestore available globally to the rest of the app
+  window.firestore = db;
+  window.fsModules = { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot };
+  window.firebaseReady = true;
+  console.log('✅ Firebase connected to Swati Tutorials!');
+</script>
+
 </head>
 <body>
 
